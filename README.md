@@ -51,7 +51,7 @@ https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 
 What happens next:
 
-1. The agent reads [`SKILL.md`](SKILL.md) and asks a few questions about your image output, dimensions, and fields.
+1. The agent reads [`SKILL.md`](SKILL.md) and asks a few questions about your image output and where it will be used.
 2. You confirm the summary.
 3. The agent creates `coverkit-usecase-<slug>/` in the directory where you invoked it (open your WordPress `plugins/` folder in the IDE first, or tell the agent another path).
 4. Activate the plugin in **Plugins**, then enable the use case in the CoverKit template editor (**Use cases** sidebar).
