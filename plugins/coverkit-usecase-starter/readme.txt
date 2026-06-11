@@ -1,4 +1,4 @@
-=== CoverKit Use Case — Starter ===
+=== CoverKit Use Case: Starter ===
 Contributors: everpress
 Requires at least: 6.5
 Tested up to: 6.8
