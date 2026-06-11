@@ -3,6 +3,11 @@ name: Create Release
 
 on:
     workflow_dispatch:
+        inputs:
+            version:
+                description: Release version (e.g. 0.1.1) — required when not triggered by a tag
+                required: false
+                type: string
     push:
         tags:
             - 'v*'
@@ -26,13 +31,23 @@ jobs:
               with:
                   fetch-depth: 0
 
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: .nvmrc
+
             - name: Resolve version
               id: version
               run: |
                   if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
                     VERSION="${GITHUB_REF#refs/tags/v}"
+                    TAG_NAME="${GITHUB_REF_NAME}"
+                  elif [[ -n "${{ github.event.inputs.version }}" ]]; then
+                    VERSION="${{ github.event.inputs.version }}"
+                    TAG_NAME="v${VERSION}"
                   else
-                    VERSION=$(jq -r '.version' < package.json)
+                    echo "workflow_dispatch requires a version input when not triggered by a tag" >&2
+                    exit 1
                   fi
 
                   if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
@@ -41,23 +56,13 @@ jobs:
                   fi
 
                   echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+            - name: Install Composer dependencies
+              run: composer install --no-interaction --prefer-dist
 
             - name: Build per-use-case zips
-              run: |
-                  VERSION="${{ steps.version.outputs.version }}"
-                  mkdir -p dist
-
-                  for plugin_dir in plugins/coverkit-usecase-*; do
-                    slug=$(basename "$plugin_dir")
-                    zip_name="${slug}-${VERSION}.zip"
-                    (
-                      cd "$plugin_dir"
-                      zip -r "../../dist/${zip_name}" . \
-                        -x '*.DS_Store' \
-                        -x '*/.git/*'
-                    )
-                    echo "Created dist/${zip_name}"
-                  done
+              run: composer run package:release
 
             - name: Extract changelog section
               id: changelog
@@ -77,7 +82,7 @@ jobs:
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v3
               with:
-                  tag_name: ${{ github.ref_name }}
+                  tag_name: ${{ steps.version.outputs.tag_name }}
                   name: v${{ steps.version.outputs.version }}
                   body_path: release-notes.md
                   files: dist/*.zip

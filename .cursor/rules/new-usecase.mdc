@@ -10,4 +10,6 @@ Follow [`.cursor/skills/new-usecase/SKILL.md`](../skills/new-usecase/SKILL.md) f
 
 **Summary:** Scaffold one plugin under `plugins/coverkit-usecase-<kebab>/` with a **complete WordPress plugin header**, `coverkit_init` registration (priority 5), and optional `CoverKit\Use_Case` subclass. Reference: `plugins/coverkit-usecase-starter/`.
 
+**Version:** Read from root `package.json`; `composer run sync:version` propagates to all plugins at release time.
+
 **Wire up:** README use cases table, `composer run docs:skills`, `composer run lint:php`.

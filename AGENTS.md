@@ -18,6 +18,7 @@ Requires the main [CoverKit](https://github.com/everpress-co/coverkit) plugin.
 | **new-usecase** | Scaffold `plugins/coverkit-usecase-<slug>/` |
 | **understand-use-cases** | Onboarding, architecture questions |
 | **lint-usecase** | PHPCS, README table, tests before PR |
+| **do-release** | Cut a monorepo release (`/do-release`) |
 
 Regenerate the README skills table: `composer run docs:skills`
 
@@ -33,6 +34,8 @@ Regenerate the README skills table: `composer run docs:skills`
 composer run lint:php
 COVERKIT_PLUGIN_DIR=../coverkit composer run test:php
 composer run docs:skills
+composer run sync:version:check
+composer run package:release:verify
 ```
 
 ## Reference

@@ -30,17 +30,28 @@ composer run docs:skills
 
 CI runs the same checks on pull requests. CoverKit is checked out from the `develop` branch for PHPUnit.
 
-## Version sync
+## Version sync and releases
 
-Keep these in sync when preparing a release:
+**Source of truth:** [`package.json`](package.json) `"version"`.
 
-| File | Field |
+```bash
+composer run sync:version        # propagate version to PHP headers and readme.txt files
+composer run sync:version:check  # CI / pre-commit drift check
+composer run package:release     # build install-ready zips to dist/
+composer run package:release:verify
+```
+
+`sync:version` updates:
+
+| Target | Fields |
 | --- | --- |
-| `package.json` | `"version"` |
-| `coverkit-usecases.php` | `Version:` header and `COVERKIT_USECASES_VERSION` |
-| `CHANGELOG.md` | `## [x.y.z]` section for the release tag |
+| `coverkit-usecases.php` | `Version:` header, `COVERKIT_USECASES_VERSION` |
+| Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` |
+| Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` |
 
-Release tags use the `v*` prefix (e.g. `v0.1.0`). The workflow creates one zip per folder in `plugins/coverkit-usecase-*`.
+**Cut a release:** use **`/do-release`** in Cursor (see [`.cursor/commands/do-release.md`](.cursor/commands/do-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
+
+Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **one zip per folder** in `plugins/coverkit-usecase-*`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 
 ## Changelog
 

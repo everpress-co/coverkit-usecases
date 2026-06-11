@@ -56,6 +56,26 @@ Defer `require_once` of subclass files until the `coverkit_init` callback. `Requ
 - **Label only** — omit `class` in registration args; CoverKit uses base `Use_Case` defaults.
 - **Subclass** — extend `CoverKit\Use_Case`; override `recommended_settings()`, `use_case_mapping_sources()`, `use_case_settings_schema()`, and optionally `init()` for front-end behavior.
 
+## Release packaging
+
+```mermaid
+flowchart LR
+  pkg[package.json version] --> sync[sync-version.php]
+  sync --> php[PHP headers + constants]
+  sync --> readme[readme.txt Stable tag]
+  pkg --> build[package-plugins.php]
+  build --> stage[build/release/slug]
+  stage --> zip["dist/slug-version.zip"]
+```
+
+1. **`sync-version.php`** — copies `package.json` version into the loader, every use case bootstrap, and each `readme.txt`.
+2. **`package-plugins.php`** — for each `plugins/coverkit-usecase-*`:
+   - optional `npm run build` when the plugin has `package.json`
+   - stage production files only (excludes `src/`, `node_modules/`, tests, dev config)
+   - zip with **folder root** `<slug>/` so WordPress can install from **Plugins → Add New → Upload**
+
+CI runs `composer run package:release` on tag push; assets attach to the GitHub Release. The monorepo loader is **not** zipped — releases target standalone per-use-case installs.
+
 ## Further reading
 
 - [Create a use case](create-a-use-case.md)

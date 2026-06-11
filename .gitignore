@@ -4,6 +4,7 @@ vendor/
 
 # Build / cache
 build/
+dist/
 .phpunit.cache
 .eslintcache
 *.zip
