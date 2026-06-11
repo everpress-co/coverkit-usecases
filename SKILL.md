@@ -9,7 +9,16 @@ description: >-
 
 Scaffold **one standalone WordPress plugin** that registers a custom CoverKit use case.
 
-**Scaffold location:** create `coverkit-usecase-<kebab>/` in the **directory where the user invoked this skill** (workspace root or current working directory). Do **not** prepend `wp-content/plugins/` — the user’s IDE is already at the right place (often their WordPress `plugins/` folder, but not always).
+**Scaffold location:** resolve the target from the **directory where the user invoked this skill** (workspace root or current working directory). Do **not** prepend `wp-content/plugins/` — the user’s IDE is already at the right place (often their WordPress `plugins/` folder, but not always).
+
+**Two modes** (see **Resolve scaffold target** below):
+
+| Mode | When | Result |
+| --- | --- | --- |
+| **In place** | Current directory is already the plugin root | Scaffold bootstrap + `readme.txt` (and subclass files) **directly in** the current directory |
+| **Subfolder** | Current directory is a parent (e.g. `wp-content/plugins/`) | Create `coverkit-usecase-<kebab>/` and scaffold inside it |
+
+Default to **in place** when the current directory looks like an empty or dedicated plugin folder — do **not** nest `coverkit-usecase-<kebab>/` inside an existing plugin root.
 
 **Requires:** the main [CoverKit](https://coverkit.com) plugin (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5).
 
@@ -94,7 +103,7 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | Mapping needs unclear | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
-| Target folder unclear | **Where should the plugin folder be created?** Default: current directory → `coverkit-usecase-<kebab>/`. If the user wants a different parent (e.g. `wp-content/plugins/`), use that path and create missing parent folders first. |
+| Target folder unclear | **Where should the plugin be scaffolded?** Offer options based on **Resolve scaffold target** (below). Default: **in place** when the current directory is already the plugin root; **subfolder** when the current directory is a parent like `plugins/`. |
 | Size or format still ambiguous after inference | **Dimensions, crop, or formats** — propose sensible values first from the description and examples below; ask only to confirm or override. |
 
 ### Infer from the description (do not ask for output upfront)
@@ -134,6 +143,38 @@ Infer when possible; always let the user override.
 - When the request is vague, suggest 2–3 concrete use case ideas from **Explore existing examples**, then ask for a clearer description — not a separate "output" questionnaire.
 - Do **not** ask for dimensions, crop, formats, or editor-vs-front-end upfront — infer them from the description; ask only if ambiguous.
 
+### Resolve scaffold target (before Phase 1)
+
+Inspect the **current working directory** (workspace root). Choose **in place** or **subfolder** before summarizing the target path.
+
+**Use in place** (scaffold files in `.`, no nested plugin folder) when **any** of these is true:
+
+| Signal | Examples |
+| --- | --- |
+| Directory is empty or nearly empty | Only `.git/`, `.cursor/`, `.vscode/`, `README.md`, or similar — no WordPress bootstrap PHP yet |
+| Directory basename is already a plugin folder | `coverkit-usecase-email-header/`, `coverkit-test-use-case/`, or any single-folder workspace the user opened for this plugin |
+| Directory basename matches `coverkit-usecase-<kebab>` for the confirmed slug | Folder name aligns with the use case being created |
+
+**Use subfolder** (create `coverkit-usecase-<kebab>/` inside the current directory) when **any** of these is true:
+
+| Signal | Examples |
+| --- | --- |
+| Current directory is a plugins container | `wp-content/plugins/`, monorepo `plugins/`, or folder listing multiple plugin directories |
+| Current directory already contains an unrelated WordPress plugin | Another plugin’s bootstrap PHP is present |
+| User explicitly chose a parent path during discovery | “Put it in `wp-content/plugins/`” |
+
+**Discovery question** (when target is unclear — use editor question UI when available):
+
+> **Where should the plugin be scaffolded?**
+>
+> - **A: Here (current directory)** — scaffold files in `my-plugin-folder/` *(default when this folder is empty or is clearly the plugin root)*
+> - **B: New subfolder** — create `coverkit-usecase-<kebab>/` inside the current directory *(default when current directory is `plugins/` or similar)*
+> - **C: Different path** — user specifies in a follow-up
+
+When **in place**, the **plugin folder name** is the current directory basename. Bootstrap filename and text domain match that basename (WordPress convention: `dirname(dirname.php)`). If the basename does not follow `coverkit-usecase-<kebab>`, note in Phase 4 that renaming to the standard pattern is optional but recommended.
+
+When **subfolder**, the plugin folder name is `coverkit-usecase-<kebab>` as usual.
+
 ## Phase 1 — Confirm before scaffold
 
 Summarize in plain language:
@@ -143,7 +184,7 @@ Summarize in plain language:
 - **Label-only** vs custom PHP **subclass** (and why)
 - Field mappings (required / optional)
 - Front-end behavior (if any)
-- Target folder: `<base>/coverkit-usecase-<kebab>/` (default `<base>` = current directory)
+- Scaffold target: **in place** at `./` or **subfolder** at `<base>/coverkit-usecase-<kebab>/` (state which mode and the resolved path)
 - Plugin **Author**, **Author URI**, and **Plugin URI** (if any)
 
 Ask: **“Does this match what you need?”** Proceed only after yes (or user adjusts).
@@ -172,11 +213,13 @@ From confirmed answers:
 | --- | --- |
 | **Invalid slug** | Reject characters outside `[a-z0-9_]` |
 | **Built-in collision** | Do not use `sandbox`, `opengraph`, `featured_image`, or other CoverKit built-ins without explicit user confirmation |
-| **Folder exists** | `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug |
+| **Folder exists** | **Subfolder mode:** `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug. **In place mode:** bootstrap PHP already exists in the current directory → stop; suggest editing or pick another location. |
 
 ## Phase 3 — Scaffold
 
-Create `<base>/coverkit-usecase-<kebab>/` where `<base>` is the confirmed directory (default: current working directory). Create `<base>` and any missing parent folders when the user chose a path that does not exist yet.
+**Subfolder mode:** create `<base>/coverkit-usecase-<kebab>/` and scaffold inside it. Create `<base>` and any missing parent folders when the user chose a path that does not exist yet.
+
+**In place mode:** scaffold directly in the current directory. Do **not** create a nested `coverkit-usecase-<kebab>/` subfolder. Use the directory basename for the bootstrap filename and text domain (e.g. `coverkit-test-use-case/coverkit-test-use-case.php`).
 
 Default plugin version: **`1.0.0`** (user can override).
 
@@ -421,7 +464,7 @@ Only when the user explicitly needs JS/CSS — otherwise skip.
 
 Tell the user:
 
-1. Folder path where the plugin was created (`<base>/coverkit-usecase-<kebab>/`).
+1. Folder path where the plugin was created (in-place directory or `<base>/coverkit-usecase-<kebab>/`).
 2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
 4. Map template shapes to the confirmed WordPress fields and preview.
@@ -433,7 +476,8 @@ Do **not** commit unless the user asks.
 
 - Scaffold before discovery and user confirmation.
 - Put multiple use cases in one plugin.
-- Prepend `wp-content/plugins/` to the scaffold path — create `coverkit-usecase-<kebab>/` directly in the confirmed base directory.
+- Prepend `wp-content/plugins/` to the scaffold path — create `coverkit-usecase-<kebab>/` directly in the confirmed base directory when using **subfolder** mode.
+- Nest `coverkit-usecase-<kebab>/` inside a directory that is already the plugin root (empty folder, `coverkit-usecase-*`, or other single-plugin workspace) — use **in place** mode instead.
 - Put multiple use cases in one plugin folder — each use case is its own **top-level** WordPress plugin directory.
 - Add `define()` constants for version, file, or directory paths — keep the bootstrap minimal.
 - Omit `Requires Plugins: coverkit` or registration on `coverkit_init` priority 5.
