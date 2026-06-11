@@ -12,7 +12,7 @@ Read this skill and create a CoverKit use case:
 https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 ```
 
-The agent reads [root `SKILL.md`](../SKILL.md), asks discovery questions, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the current directory (or a path you specify).
+The agent reads [root `SKILL.md`](../SKILL.md), asks discovery questions, confirms a summary, then scaffolds **in place** when the current directory is already the plugin root (empty folder or single-plugin workspace), or creates `coverkit-usecase-<slug>/` when the current directory is a parent like `wp-content/plugins/`.
 
 ## Monorepo — Cursor
 

@@ -9,7 +9,16 @@ description: >-
 
 Scaffold **one standalone WordPress plugin** that registers a custom CoverKit use case.
 
-**Scaffold location:** create `coverkit-usecase-<kebab>/` in the **directory where the user invoked this skill** (workspace root or current working directory). Do **not** prepend `wp-content/plugins/` — the user’s IDE is already at the right place (often their WordPress `plugins/` folder, but not always).
+**Scaffold location:** resolve the target from the **directory where the user invoked this skill** (workspace root or current working directory). Do **not** prepend `wp-content/plugins/` — the user’s IDE is already at the right place (often their WordPress `plugins/` folder, but not always).
+
+**Two modes** (see **Resolve scaffold target** below):
+
+| Mode | When | Result |
+| --- | --- | --- |
+| **In place** | Current directory is already the plugin root | Scaffold bootstrap + `readme.txt` (and subclass files) **directly in** the current directory |
+| **Subfolder** | Current directory is a parent (e.g. `wp-content/plugins/`) | Create `coverkit-usecase-<kebab>/` and scaffold inside it |
+
+Default to **in place** when the current directory looks like an empty or dedicated plugin folder — do **not** nest `coverkit-usecase-<kebab>/` inside an existing plugin root.
 
 **Requires:** the main [CoverKit](https://coverkit.com) plugin (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5).
 
@@ -82,7 +91,8 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | # | Question | Why |
 | --- | --- | --- |
 | 1 | **What is this use case for?** — A clear description of the goal, context, and where the image matters (e.g. "header graphic for Mailchimp newsletters — editors preview and download in the template editor" or "LinkedIn share image on single posts, injected as `og:image`"). | Drives label, slug, purpose, dimensions, mappings, and label-only vs subclass |
-| 2 | **Plugin author metadata** — **Author** name, **Author URI** (your site), and optional **Plugin URI** (project/repo link). Suggest values you can infer (see below); user confirms or overrides. | WordPress plugin header |
+
+**Do not ask for plugin author metadata** — infer **Author**, **Author URI**, and **Plugin URI** silently (see below). Omit header lines when unknown.
 
 **Do not ask for "output" separately** — dimensions, crop, formats, editor-only vs front-end behavior, and field mappings depend on the use case. Infer them from a good description; ask follow-ups only when the description leaves gaps.
 
@@ -94,7 +104,7 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | Mapping needs unclear | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
-| Target folder unclear | **Where should the plugin folder be created?** Default: current directory → `coverkit-usecase-<kebab>/`. If the user wants a different parent (e.g. `wp-content/plugins/`), use that path and create missing parent folders first. |
+| Target folder unclear | **Where should the plugin be scaffolded?** Offer options based on **Resolve scaffold target** (below). Default: **in place** when the current directory is already the plugin root; **subfolder** when the current directory is a parent like `plugins/`. |
 | Size or format still ambiguous after inference | **Dimensions, crop, or formats** — propose sensible values first from the description and examples below; ask only to confirm or override. |
 
 ### Infer from the description (do not ask for output upfront)
@@ -115,24 +125,56 @@ From a good use case description, decide **dimensions, crop, formats, editor-onl
 
 When inferring, state your proposal in the Phase 1 summary (“LinkedIn share → 1200×627, cropped”) so the user can correct it — do not block discovery on pixel-perfect answers upfront.
 
-### Suggested author metadata (propose, then confirm)
+### Author metadata (infer silently — never ask)
 
-Infer when possible; always let the user override.
+Fill the WordPress plugin header from the environment when you can; **omit the header line** when a value is unknown. Do not include author fields in discovery questions or the Phase 1 confirmation unless the user volunteered them.
 
-| Field | Where to look | Example fallback |
+| Field | Where to look | If unknown |
 | --- | --- | --- |
-| **Author** | `git config user.name`, workspace/site branding, user’s first reply | Ask if nothing reliable |
-| **Author URI** | Site URL in the project (`WP_HOME`, `siteurl` in config, package.json `homepage`, README links) | Ask if unknown |
-| **Plugin URI** | User’s repo URL, project homepage, or omit | Leave empty if user has no preference |
+| **Author** | `git config user.name`, workspace/site branding | Omit `Author:` line |
+| **Author URI** | Site URL in the project (`WP_HOME`, `siteurl` in config, package.json `homepage`, README links) | Omit `Author URI:` line |
+| **Plugin URI** | Git remote URL, project homepage | Omit `Plugin URI:` line |
 
 ### Rules for asking
 
 - **Expect a good description** — purpose, context, and where the image matters. That is enough to infer most technical choices.
 - Batch questions in **one message** when possible.
 - Skip follow-ups already answered in the user's first reply.
-- If the user gave a rich description upfront, acknowledge it and only ask **gaps** (usually author metadata and folder path).
+- If the user gave a rich description upfront, acknowledge it and only ask **gaps** (usually folder path when ambiguous).
 - When the request is vague, suggest 2–3 concrete use case ideas from **Explore existing examples**, then ask for a clearer description — not a separate "output" questionnaire.
 - Do **not** ask for dimensions, crop, formats, or editor-vs-front-end upfront — infer them from the description; ask only if ambiguous.
+
+### Resolve scaffold target (before Phase 1)
+
+Inspect the **current working directory** (workspace root). Choose **in place** or **subfolder** before summarizing the target path.
+
+**Use in place** (scaffold files in `.`, no nested plugin folder) when **any** of these is true:
+
+| Signal | Examples |
+| --- | --- |
+| Directory is empty or nearly empty | Only `.git/`, `.cursor/`, `.vscode/`, `README.md`, or similar — no WordPress bootstrap PHP yet |
+| Directory basename is already a plugin folder | `coverkit-usecase-email-header/`, `coverkit-test-use-case/`, or any single-folder workspace the user opened for this plugin |
+| Directory basename matches `coverkit-usecase-<kebab>` for the confirmed slug | Folder name aligns with the use case being created |
+
+**Use subfolder** (create `coverkit-usecase-<kebab>/` inside the current directory) when **any** of these is true:
+
+| Signal | Examples |
+| --- | --- |
+| Current directory is a plugins container | `wp-content/plugins/`, monorepo `plugins/`, or folder listing multiple plugin directories |
+| Current directory already contains an unrelated WordPress plugin | Another plugin’s bootstrap PHP is present |
+| User explicitly chose a parent path during discovery | “Put it in `wp-content/plugins/`” |
+
+**Discovery question** (when target is unclear — use editor question UI when available):
+
+> **Where should the plugin be scaffolded?**
+>
+> - **A: Here (current directory)** — scaffold files in `my-plugin-folder/` *(default when this folder is empty or is clearly the plugin root)*
+> - **B: New subfolder** — create `coverkit-usecase-<kebab>/` inside the current directory *(default when current directory is `plugins/` or similar)*
+> - **C: Different path** — user specifies in a follow-up
+
+When **in place**, the **plugin folder name** is the current directory basename. Bootstrap filename and text domain match that basename (WordPress convention: `dirname(dirname.php)`). If the basename does not follow `coverkit-usecase-<kebab>`, note in Phase 4 that renaming to the standard pattern is optional but recommended.
+
+When **subfolder**, the plugin folder name is `coverkit-usecase-<kebab>` as usual.
 
 ## Phase 1 — Confirm before scaffold
 
@@ -143,8 +185,7 @@ Summarize in plain language:
 - **Label-only** vs custom PHP **subclass** (and why)
 - Field mappings (required / optional)
 - Front-end behavior (if any)
-- Target folder: `<base>/coverkit-usecase-<kebab>/` (default `<base>` = current directory)
-- Plugin **Author**, **Author URI**, and **Plugin URI** (if any)
+- Scaffold target: **in place** at `./` or **subfolder** at `<base>/coverkit-usecase-<kebab>/` (state which mode and the resolved path)
 
 Ask: **“Does this match what you need?”** Proceed only after yes (or user adjusts).
 
@@ -162,9 +203,9 @@ From confirmed answers:
 | **namespace** | `CoverKitUseCase<Studly>` (subclass only) | `CoverKitUseCaseEmailHeader` |
 | **text domain** | same as plugin folder | `coverkit-usecase-email-header` |
 | **label** | user-facing title | `Email header` |
-| **author** | confirmed Author header | `Jane Doe` |
-| **author_uri** | confirmed Author URI | `https://example.com` |
-| **plugin_uri** | confirmed Plugin URI or empty | `https://github.com/janedoe/coverkit-usecase-email-header` |
+| **author** | inferred; omit header line if empty | `Jane Doe` |
+| **author_uri** | inferred; omit header line if empty | `https://example.com` |
+| **plugin_uri** | inferred; omit header line if empty | `https://github.com/janedoe/coverkit-usecase-email-header` |
 
 ### Slug validation
 
@@ -172,11 +213,13 @@ From confirmed answers:
 | --- | --- |
 | **Invalid slug** | Reject characters outside `[a-z0-9_]` |
 | **Built-in collision** | Do not use `sandbox`, `opengraph`, `featured_image`, or other CoverKit built-ins without explicit user confirmation |
-| **Folder exists** | `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug |
+| **Folder exists** | **Subfolder mode:** `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug. **In place mode:** bootstrap PHP already exists in the current directory → stop; suggest editing or pick another location. |
 
 ## Phase 3 — Scaffold
 
-Create `<base>/coverkit-usecase-<kebab>/` where `<base>` is the confirmed directory (default: current working directory). Create `<base>` and any missing parent folders when the user chose a path that does not exist yet.
+**Subfolder mode:** create `<base>/coverkit-usecase-<kebab>/` and scaffold inside it. Create `<base>` and any missing parent folders when the user chose a path that does not exist yet.
+
+**In place mode:** scaffold directly in the current directory. Do **not** create a nested `coverkit-usecase-<kebab>/` subfolder. Use the directory basename for the bootstrap filename and text domain (e.g. `coverkit-test-use-case/coverkit-test-use-case.php`).
 
 Default plugin version: **`1.0.0`** (user can override).
 
@@ -206,7 +249,7 @@ coverkit-usecase-<kebab>/
 
 ### Bootstrap file (`coverkit-usecase-<kebab>.php`)
 
-One file with a WordPress plugin header and registration on `coverkit_init` priority **5**. No version/path constants — use `plugin_dir_path( __FILE__ )` only when loading a subclass.
+One file with a WordPress plugin header and registration on `coverkit_init` priority **5**. No version/path constants — use `plugin_dir_path( __FILE__ )` only when loading a subclass. Include **Author**, **Author URI**, and **Plugin URI** lines only when inferred — omit each line entirely when unknown.
 
 **Label only:**
 
@@ -214,12 +257,9 @@ One file with a WordPress plugin header and registration on `coverkit_init` prio
 <?php
 /**
  * Plugin Name: CoverKit Use Case: <Label>
- * Plugin URI: <plugin_uri or omit this line>
  * Description: <One-line purpose from discovery>
  * Version: 1.0.0
  * Requires Plugins: coverkit
- * Author: <author>
- * Author URI: <author_uri>
  * Text Domain: coverkit-usecase-<kebab>
  */
 
@@ -247,12 +287,9 @@ add_action(
 <?php
 /**
  * Plugin Name: CoverKit Use Case: <Label>
- * Plugin URI: <plugin_uri or omit this line>
  * Description: <One-line purpose from discovery>
  * Version: 1.0.0
  * Requires Plugins: coverkit
- * Author: <author>
- * Author URI: <author_uri>
  * Text Domain: coverkit-usecase-<kebab>
  */
 
@@ -344,18 +381,18 @@ https://example.com/wp-json/coverkit/v1/use-case/email_header/123/456.jpg
 
 The response is the image bytes (generated on first request, then cached). Use this URL in `<img src="…">`, meta tags, newsletters, or any HTTP client.
 
-**Build the URL in PHP** with `\CoverKit\coverkit_rest_use_case_image_url()`:
+**Build the URL in PHP** from a `CoverKit\Use_Case` subclass with `static::get_image_url()` (resolves slug and assigned `format` automatically):
 
 ```php
-$image_url = \CoverKit\coverkit_rest_use_case_image_url(
- '<snake>',   // registered use-case slug
- 123,         // CoverKit template post ID
- 456,         // source post ID (field data comes from here)
- 'jpg',       // extension — match recommended formats
- null,        // optional ?width= (privileged users only)
- false        // false = public URL without _wpnonce (meta tags, crawlers)
+$image_url = static::get_image_url(
+ 123,    // CoverKit template post ID
+ 456,    // source post ID (field data comes from here; 0 for site-level)
+ null,   // optional ?width= (privileged users only)
+ false   // false = public URL without _wpnonce (meta tags, crawlers)
 );
 ```
+
+Lower-level fallback when you are not inside a use case class: `\CoverKit\coverkit_rest_use_case_image_url( '<snake>', $template_id, $post_id, 'jpg', null, false )`.
 
 | Where the image is used | Registration | Last argument to helper |
 | --- | --- | --- |
@@ -388,14 +425,7 @@ public function inject_meta(): void {
  $post_id     = (int) get_queried_object_id();
  $template_id = 123; // TODO: resolve enabled template for this use case + post
 
- $image_url = \CoverKit\coverkit_rest_use_case_image_url(
-  static::get_slug(),
-  $template_id,
-  $post_id,
-  'jpg',
-  null,
-  false
- );
+ $image_url = static::get_image_url( $template_id, $post_id, null, false );
 
  echo '<meta property="og:image" content="' . esc_url( $image_url ) . "\" />\n";
 }
@@ -421,11 +451,11 @@ Only when the user explicitly needs JS/CSS — otherwise skip.
 
 Tell the user:
 
-1. Folder path where the plugin was created (`<base>/coverkit-usecase-<kebab>/`).
+1. Folder path where the plugin was created (in-place directory or `<base>/coverkit-usecase-<kebab>/`).
 2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
 4. Map template shapes to the confirmed WordPress fields and preview.
-5. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `\CoverKit\coverkit_rest_use_case_image_url()` in PHP. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
+5. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `static::get_image_url()` in your use case class. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
 
 Do **not** commit unless the user asks.
 
@@ -433,7 +463,8 @@ Do **not** commit unless the user asks.
 
 - Scaffold before discovery and user confirmation.
 - Put multiple use cases in one plugin.
-- Prepend `wp-content/plugins/` to the scaffold path — create `coverkit-usecase-<kebab>/` directly in the confirmed base directory.
+- Prepend `wp-content/plugins/` to the scaffold path — create `coverkit-usecase-<kebab>/` directly in the confirmed base directory when using **subfolder** mode.
+- Nest `coverkit-usecase-<kebab>/` inside a directory that is already the plugin root (empty folder, `coverkit-usecase-*`, or other single-plugin workspace) — use **in place** mode instead.
 - Put multiple use cases in one plugin folder — each use case is its own **top-level** WordPress plugin directory.
 - Add `define()` constants for version, file, or directory paths — keep the bootstrap minimal.
 - Omit `Requires Plugins: coverkit` or registration on `coverkit_init` priority 5.
