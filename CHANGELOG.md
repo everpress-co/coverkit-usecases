@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-06-11
+
 - added: root SKILL.md — paste one prompt in your IDE, answer a few questions, and scaffold a custom CoverKit use case plugin without installing a skill
 - improved: public docs and agent skills link to docs.coverkit.com instead of the private CoverKit GitHub repository
 - improved: README use cases table links directly to the latest release zip for each plugin
