@@ -79,5 +79,5 @@ CI runs `composer run package:release` on tag push; assets attach to the GitHub 
 ## Further reading
 
 - [Create a use case](create-a-use-case.md)
-- CoverKit [custom use case user guide](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md)
+- CoverKit [custom use case user guide](https://docs.coverkit.com/user-guide/use-cases/custom-use-case/)
 - [Agent skills](agents.md)

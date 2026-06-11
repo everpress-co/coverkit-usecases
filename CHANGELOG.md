@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- added: root SKILL.md — paste one prompt in your IDE, answer a few questions, and scaffold a custom CoverKit use case plugin without installing a skill
+- improved: public docs and agent skills link to docs.coverkit.com instead of the private CoverKit GitHub repository
+
 ## [0.1.1] — 2026-06-11
 
 - added: `/do-release` command and `sync:version` so all use case plugins share the monorepo release version

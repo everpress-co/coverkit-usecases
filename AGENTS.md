@@ -2,7 +2,19 @@
 
 Public monorepo for **custom CoverKit use cases**. Each folder under `plugins/coverkit-usecase-*` is a standalone WordPress plugin that registers one use case on `coverkit_init`.
 
-Requires the main [CoverKit](https://github.com/everpress-co/coverkit) plugin.
+Requires the main [CoverKit](https://coverkit.com) plugin.
+
+## Public — create a use case in any IDE
+
+Paste in your agent (no install):
+
+```text
+Read this skill and create a CoverKit use case:
+
+https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
+```
+
+See [root `SKILL.md`](SKILL.md) and [`docs/create-a-use-case.md`](docs/create-a-use-case.md).
 
 ## Monorepo rules
 
@@ -41,4 +53,4 @@ composer run package:release:verify
 ## Reference
 
 - Starter template: `plugins/coverkit-usecase-starter/`
-- CoverKit custom use cases: https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md
+- CoverKit custom use cases: https://docs.coverkit.com/user-guide/use-cases/custom-use-case/

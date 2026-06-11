@@ -1,31 +1,21 @@
 ---
 name: understand-use-cases
 description: >-
-  Onboarding for the coverkit-usecases monorepo: loader vs standalone install,
-  coverkit_register_use_case API, label-only vs subclass, built-in slugs to
-  avoid, and links to CoverKit reference classes.
+  CoverKit custom use case architecture: coverkit_register_use_case API,
+  label-only vs subclass, built-in slugs to avoid, and docs.coverkit.com
+  references. Use when onboarding or reviewing how use case plugins work.
 disable-model-invocation: true
 ---
 
-# Understand CoverKit use cases (this repo)
+# Understand CoverKit use cases
 
-Use when onboarding to the repo, reviewing architecture, or deciding how to implement a custom use case.
+Use when explaining how custom use case plugins work, reviewing architecture, or deciding label-only vs subclass.
 
-## Repo layout
+## One plugin = one use case
 
-```
-coverkit-usecases/
-├── coverkit-usecases.php              # Monorepo loader (activate in dev)
-├── plugins/coverkit-usecase-<slug>/   # One WordPress plugin per use case
-└── tests/php/                         # PHPUnit for this repo only
-```
+Each custom use case is a **standalone WordPress plugin** in `wp-content/plugins/coverkit-usecase-<slug>/` with `Requires Plugins: coverkit`. Site owners install and activate it like any other plugin.
 
-## Monorepo vs standalone
-
-| Context | How it loads |
-| --- | --- |
-| **Monorepo dev** | Clone into `wp-content/plugins/coverkit-usecases`, activate **CoverKit Use Cases**. Root loader `require_once`s each bootstrap on `plugins_loaded` — WordPress does not scan nested `plugins/`. |
-| **Release zip** | Download from [Releases](https://github.com/everpress-co/coverkit-usecases/releases), extract to `wp-content/plugins/coverkit-usecase-<slug>/`, activate like any plugin. Each zip has a full WP plugin header and `Requires Plugins: coverkit`. |
+To scaffold a new use case, use [root `SKILL.md`](../../../SKILL.md) (paste the URL prompt from [`README.md`](../../../README.md)) — not this file.
 
 ## Registration API
 
@@ -48,19 +38,14 @@ Defer `require_once` of subclass files until inside the `coverkit_init` callback
 
 CoverKit ships built-ins such as `sandbox`, `opengraph`, `featured_image`. Custom slugs should be distinct (e.g. `email_header`, `pinterest_board`).
 
-## CoverKit reference
+## CoverKit reference (public docs)
 
-- Base class: `CoverKit\Use_Case` in main plugin `includes/class-coverkit-use-case.php`
-- Registry: `CoverKit\Use_Case_Registry`
-- User guide: [Custom use cases](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md)
-- Example in main plugin: `includes/use-cases/class-coverkit-minimal-use-case.php`
-
-## Docs in this repo
-
-- [`docs/create-a-use-case.md`](../../../docs/create-a-use-case.md) — step-by-step
-- [`docs/architecture.md`](../../../docs/architecture.md) — loader, headers, subclass patterns
-- [`docs/agents.md`](../../../docs/agents.md) — skills and agent entry points
+- [Custom use cases (developers)](https://docs.coverkit.com/user-guide/use-cases/custom-use-case/)
+- [Use cases and output profiles](https://docs.coverkit.com/codebase/use-cases-and-output-profiles/)
+- [Hooks and extension points](https://docs.coverkit.com/codebase/hooks-and-extension-points/)
+- Base class: `CoverKit\Use_Case`; registry: `CoverKit\Use_Case_Registry`
 
 ## Scaffolding
 
-Use **`/new-usecase <slug>`** or read [`.cursor/skills/new-usecase/SKILL.md`](../new-usecase/SKILL.md).
+- **Any WordPress site:** [root `SKILL.md`](../../../SKILL.md) URL prompt (discovery Q&A, then scaffold under `wp-content/plugins/`).
+- **Maintainers in this repository:** `/new-usecase <slug>` or [`.cursor/skills/new-usecase/SKILL.md`](../new-usecase/SKILL.md).

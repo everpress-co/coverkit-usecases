@@ -5,7 +5,7 @@ Thanks for contributing to CoverKit Use Cases!
 ## Development setup
 
 1. Clone this repo into `wp-content/plugins/coverkit-usecases/`.
-2. Clone [CoverKit](https://github.com/everpress-co/coverkit) as a sibling plugin (`wp-content/plugins/coverkit/`).
+2. Install [CoverKit](https://coverkit.com) as a sibling plugin (`wp-content/plugins/coverkit/`). See [installation docs](https://docs.coverkit.com/user-guide/installation/).
 3. Install dependencies:
 
    ```bash
