@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-06-11
+
 - added: `/do-release` command and `sync:version` so all use case plugins share the monorepo release version
 - improved: GitHub releases attach install-ready WordPress zips (one per use case) with correct plugin folder structure
 - added: public monorepo docs, agent skills, PHPUnit CI, and per-use-case GitHub release zips

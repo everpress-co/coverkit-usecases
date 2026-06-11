@@ -3,7 +3,7 @@
  * Plugin Name: CoverKit Use Case: Starter
  * Plugin URI: https://github.com/everpress-co/coverkit-usecases
  * Description: Minimal editor-only test use case for the CoverKit use cases monorepo.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'COVERKIT_USECASE_STARTER_VERSION', '0.1.0' );
+define( 'COVERKIT_USECASE_STARTER_VERSION', '0.1.1' );
 define( 'COVERKIT_USECASE_STARTER_FILE', __FILE__ );
 define( 'COVERKIT_USECASE_STARTER_DIR', plugin_dir_path( __FILE__ ) );
 
