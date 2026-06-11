@@ -21,7 +21,7 @@ develop
   → checkpoint: optional push
 ```
 
-Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml) (unit tests, `package:release`, one install-ready zip per use case on the GitHub Release). Tag format: **`<version>`** (e.g. `v0.1.1`).
+Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml) (unit tests, `package:release`, one install-ready zip per use case on the GitHub Release). Tag format: **`<version>`** — semver **without** a `v` prefix (e.g. `0.1.1`, not `v0.1.1`).
 
 ---
 
@@ -90,7 +90,7 @@ npm version <release> --no-git-tag-version
    ```
 
    - If `PREV_TAG` is empty (first release), sync all plugins.
-   - Otherwise use `PREV_TAG` as the diff base (e.g. `v0.1.1`).
+   - Otherwise use `PREV_TAG` as the diff base (e.g. `0.1.1`).
 
 2. List changed plugins (for the release summary):
 

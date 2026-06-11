@@ -19,7 +19,7 @@ for ( $index = 1; $index < $argc; $index++ ) {
 	if ( '--changed-since' === $arg ) {
 		$changed_since = $argv[ $index + 1 ] ?? '';
 		if ( '' === $changed_since ) {
-			fwrite( STDERR, "--changed-since requires a git ref (e.g. v0.1.0)\n" );
+			fwrite( STDERR, "--changed-since requires a git ref (e.g. 0.1.0)\n" );
 			exit( 1 );
 		}
 		$sync_all_plugins = false;

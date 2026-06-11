@@ -39,12 +39,12 @@ jobs:
       - name: Resolve version
         id: version
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME}"
             TAG_NAME="${GITHUB_REF_NAME}"
           elif [[ -n "${{ github.event.inputs.version }}" ]]; then
             VERSION="${{ github.event.inputs.version }}"
-            TAG_NAME="v${VERSION}"
+            TAG_NAME="${VERSION}"
           else
             echo "workflow_dispatch requires a version input when not triggered by a tag" >&2
             exit 1
@@ -95,7 +95,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag_name }}
-          name: v${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           body_path: release-notes.md
           files: release-assets/*.zip
           fail_on_unmatched_files: true
