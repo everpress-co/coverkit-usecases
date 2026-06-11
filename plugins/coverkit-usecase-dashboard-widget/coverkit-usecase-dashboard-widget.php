@@ -20,24 +20,19 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'COVERKIT_USECASE_DASHBOARD_WIDGET_VERSION', '0.1.0' );
-define( 'COVERKIT_USECASE_DASHBOARD_WIDGET_FILE', __FILE__ );
-define( 'COVERKIT_USECASE_DASHBOARD_WIDGET_DIR', plugin_dir_path( __FILE__ ) );
-
 /**
  * Register the dashboard widget use case with CoverKit.
  *
  * @return void
  */
 function coverkit_usecase_dashboard_widget_register(): void {
-	require_once COVERKIT_USECASE_DASHBOARD_WIDGET_DIR . 'includes/class-dashboard-widget-use-case.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-dashboard-widget-use-case.php';
 
 	\CoverKit\coverkit_register_use_case(
 		'dashboard_widget',
 		array(
-			'class'       => \CoverKitUseCaseDashboardWidget\Dashboard_Widget_Use_Case::class,
-			'label'       => __( 'Dashboard widget', 'coverkit-usecase-dashboard-widget' ),
-			'single'      => true,
+			'class' => \CoverKitUseCaseDashboardWidget\Dashboard_Widget_Use_Case::class,
+			'label' => __( 'Dashboard widget', 'coverkit-usecase-dashboard-widget' ),
 		)
 	);
 }

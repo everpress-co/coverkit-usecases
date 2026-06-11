@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace CoverKitUseCaseDashboardWidget;
 
 use CoverKit\Use_Case;
-use CoverKit\Use_Case_Storage;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -18,25 +17,6 @@ defined( 'ABSPATH' ) || exit;
  * Site-wide dashboard branding via a CoverKit image background.
  */
 class Dashboard_Widget_Use_Case extends Use_Case {
-
-	/**
-	 * Dashboard widget ID.
-	 */
-	private const WIDGET_ID = 'coverkit_dashboard_widget';
-
-	/**
-	 * Cached active template ID for the current request.
-	 *
-	 * @var int|null
-	 */
-	private static ?int $resolved_template_id = null;
-
-	/**
-	 * Whether template resolution has run this request.
-	 *
-	 * @var bool
-	 */
-	private static bool $resolution_seeded = false;
 
 	/**
 	 * Dashboard branding is not scoped to post types.
@@ -120,75 +100,42 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 	}
 
 	/**
-	 * Add the CoverKit dashboard widget when a template assignment is active.
+	 * Add one CoverKit dashboard widget per active template assignment.
 	 */
 	public function register_dashboard_widget(): void {
-		$template_id = $this->resolve_active_template_id();
-		if ( null === $template_id ) {
-			return;
+		foreach ( static::find_active_template_ids() as $template_id ) {
+			$widget_id    = self::widget_id_for_template( $template_id );
+			$widget_title = $this->resolve_widget_title( $template_id );
+
+			\wp_add_dashboard_widget(
+				$widget_id,
+				$widget_title,
+				function () use ( $template_id ): void {
+					$this->render_dashboard_widget( $template_id );
+				}
+			);
 		}
-
-		$assignment = Use_Case_Storage::get_assignment( $template_id, static::get_slug() );
-		$settings   = isset( $assignment['settings'] ) && is_array( $assignment['settings'] )
-			? $assignment['settings']
-			: array();
-
-		$widget_title = isset( $settings['widget_title'] ) && is_string( $settings['widget_title'] )
-			? \trim( $settings['widget_title'] )
-			: '';
-
-		if ( '' === $widget_title ) {
-			$widget_title = (string) \get_bloginfo( 'name' );
-		}
-
-		if ( '' === $widget_title ) {
-			$widget_title = \__( 'CoverKit', 'coverkit-usecase-dashboard-widget' );
-		}
-
-		\wp_add_dashboard_widget(
-			self::WIDGET_ID,
-			$widget_title,
-			array( $this, 'render_dashboard_widget' )
-		);
 	}
 
 	/**
 	 * Output the widget content with a generated image background.
+	 *
+	 * @param int $template_id CoverKit template post ID.
 	 */
-	public function render_dashboard_widget(): void {
-		$template_id = $this->resolve_active_template_id();
-		if ( null === $template_id ) {
+	public function render_dashboard_widget( int $template_id ): void {
+		if ( $template_id <= 0 ) {
 			return;
 		}
 
-		$assignment = Use_Case_Storage::get_assignment( $template_id, static::get_slug() );
-		$settings   = isset( $assignment['settings'] ) && is_array( $assignment['settings'] )
-			? $assignment['settings']
-			: array();
+		$min_height = (int) static::get_setting( $template_id, 'min_height' );
 
-		$format = isset( $settings['format'] ) && is_string( $settings['format'] ) && '' !== $settings['format']
-			? $settings['format']
-			: 'jpg';
-
-		$min_height = isset( $settings['min_height'] ) ? (int) $settings['min_height'] : 200;
-		$min_height = max( 120, min( 600, $min_height ) );
-
-		$image_url = \CoverKit\coverkit_rest_use_case_image_url(
-			static::get_slug(),
-			$template_id,
-			0,
-			$format,
-			null,
-			true
-		);
+		$image_url = static::get_image_url( $template_id );
 
 		if ( '' === $image_url ) {
 			return;
 		}
 
-		$widget_title = isset( $settings['widget_title'] ) && is_string( $settings['widget_title'] )
-			? \trim( $settings['widget_title'] )
-			: '';
+		$widget_title = \trim( (string) static::get_setting( $template_id, 'widget_title', '' ) );
 
 		$style = \sprintf(
 			'min-height:%dpx;background-image:url(%s);',
@@ -215,16 +162,16 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 			return;
 		}
 
-		if ( null === $this->resolve_active_template_id() ) {
+		if ( array() === static::find_active_template_ids() ) {
 			return;
 		}
 
 		$css = '
-			#coverkit_dashboard_widget .inside {
+			.postbox[id^="coverkit_dashboard_widget_"] .inside {
 				margin: 0;
 				padding: 0;
 			}
-			#coverkit_dashboard_widget .coverkit-dashboard-widget {
+			.coverkit-dashboard-widget {
 				background-size: cover;
 				background-position: center;
 				background-repeat: no-repeat;
@@ -235,7 +182,7 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 				padding: 16px;
 				box-sizing: border-box;
 			}
-			#coverkit_dashboard_widget .coverkit-dashboard-widget__title {
+			.coverkit-dashboard-widget__title {
 				color: #fff;
 				font-size: 1.25em;
 				font-weight: 600;
@@ -244,52 +191,36 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 			}
 		';
 
-		\wp_register_style( 'coverkit-dashboard-widget', false, array(), COVERKIT_USECASE_DASHBOARD_WIDGET_VERSION );
+		\wp_register_style( 'coverkit-dashboard-widget', false );
 		\wp_enqueue_style( 'coverkit-dashboard-widget' );
 		\wp_add_inline_style( 'coverkit-dashboard-widget', $css );
 	}
 
 	/**
-	 * Find the first published template with an active dashboard_widget assignment.
+	 * Unique dashboard widget ID for a template assignment.
+	 *
+	 * @param int $template_id CoverKit template post ID.
 	 */
-	private function resolve_active_template_id(): ?int {
-		if ( self::$resolution_seeded ) {
-			return self::$resolved_template_id;
-		}
-
-		self::$resolution_seeded    = true;
-		self::$resolved_template_id = $this->scan_first_active_template();
-
-		return self::$resolved_template_id;
+	private static function widget_id_for_template( int $template_id ): string {
+		return 'coverkit_dashboard_widget_' . $template_id;
 	}
 
 	/**
-	 * Scan published templates in ascending ID order.
+	 * Widget metabox title for a template assignment.
+	 *
+	 * @param int $template_id CoverKit template post ID.
 	 */
-	private function scan_first_active_template(): ?int {
-		$template_ids = \get_posts(
-			array(
-				'post_type'      => 'coverkit',
-				'post_status'    => 'publish',
-				'posts_per_page' => -1,
-				'orderby'        => 'ID',
-				'order'          => 'ASC',
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			)
-		);
+	private function resolve_widget_title( int $template_id ): string {
+		$widget_title = \trim( (string) static::get_setting( $template_id, 'widget_title', '' ) );
 
-		if ( ! is_array( $template_ids ) ) {
-			return null;
+		if ( '' === $widget_title ) {
+			$widget_title = (string) \get_bloginfo( 'name' );
 		}
 
-		foreach ( $template_ids as $template_id ) {
-			$assignments = get_post_meta( $template_id, '_coverkit_assignments', true );
-			if ( ! empty( $assignments ) && is_array( $assignments ) && in_array( 'dashboard_widget', $assignments, true ) ) {
-				return $template_id;
-			}
+		if ( '' === $widget_title ) {
+			$widget_title = \__( 'CoverKit', 'coverkit-usecase-dashboard-widget' );
 		}
 
-		return null;
+		return $widget_title;
 	}
 }
