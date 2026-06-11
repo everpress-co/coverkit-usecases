@@ -10,7 +10,7 @@ Read this skill and create a CoverKit use case:
 https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 ```
 
-The skill asks follow-up questions (purpose, dimensions, editor vs front-end output, field mappings), confirms a summary, then scaffolds `wp-content/plugins/coverkit-usecase-<slug>/`. See [root `SKILL.md`](../SKILL.md).
+The skill asks follow-up questions (purpose, dimensions, editor vs front-end output, field mappings), confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the directory where you invoked it (usually your WordPress `plugins/` folder). See [root `SKILL.md`](../SKILL.md).
 
 ---
 

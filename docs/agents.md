@@ -12,7 +12,7 @@ Read this skill and create a CoverKit use case:
 https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 ```
 
-The agent reads [root `SKILL.md`](../SKILL.md), asks discovery questions, confirms a summary, then scaffolds `wp-content/plugins/coverkit-usecase-<slug>/`.
+The agent reads [root `SKILL.md`](../SKILL.md), asks discovery questions, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the current directory (or a path you specify).
 
 ## Monorepo — Cursor
 

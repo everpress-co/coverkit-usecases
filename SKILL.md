@@ -7,7 +7,9 @@ description: >-
 
 # Create a CoverKit use case
 
-Scaffold **one standalone WordPress plugin** that registers a custom CoverKit use case. Target path: `wp-content/plugins/coverkit-usecase-<kebab>/`.
+Scaffold **one standalone WordPress plugin** that registers a custom CoverKit use case.
+
+**Scaffold location:** create `coverkit-usecase-<kebab>/` in the **directory where the user invoked this skill** (workspace root or current working directory). Do **not** prepend `wp-content/plugins/` — the user’s IDE is already at the right place (often their WordPress `plugins/` folder, but not always).
 
 **Requires:** the main [CoverKit](https://coverkit.com) plugin (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5).
 
@@ -43,6 +45,7 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | Any use case | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
+| Target folder unclear | **Where should the plugin folder be created?** Default: current directory → `coverkit-usecase-<kebab>/`. If the user wants a different parent (e.g. `wp-content/plugins/`), use that path and create missing parent folders first. |
 
 ### Rules for asking
 
@@ -59,7 +62,7 @@ Summarize in plain language:
 - **Label-only** vs custom PHP **subclass** (and why)
 - Field mappings (required / optional)
 - Front-end behavior (if any)
-- Target folder: `wp-content/plugins/coverkit-usecase-<kebab>/`
+- Target folder: `<base>/coverkit-usecase-<kebab>/` (default `<base>` = current directory)
 
 Ask: **“Does this match what you need?”** Proceed only after yes (or user adjusts).
 
@@ -84,9 +87,11 @@ From confirmed answers:
 | --- | --- |
 | **Invalid slug** | Reject characters outside `[a-z0-9_]` |
 | **Built-in collision** | Do not use `sandbox`, `opengraph`, `featured_image`, or other CoverKit built-ins without explicit user confirmation |
-| **Folder exists** | `wp-content/plugins/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug |
+| **Folder exists** | `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug |
 
 ## Phase 3 — Scaffold
+
+Create `<base>/coverkit-usecase-<kebab>/` where `<base>` is the confirmed directory (default: current working directory). Create `<base>` and any missing parent folders when the user chose a path that does not exist yet.
 
 Default plugin version: **`1.0.0`** (user can override).
 
@@ -100,7 +105,7 @@ Default plugin version: **`1.0.0`** (user can override).
 **Label-only** file layout:
 
 ```
-wp-content/plugins/coverkit-usecase-<kebab>/
+coverkit-usecase-<kebab>/
 ├── coverkit-usecase-<kebab>.php
 └── readme.txt
 ```
@@ -108,7 +113,7 @@ wp-content/plugins/coverkit-usecase-<kebab>/
 **Custom behavior** file layout:
 
 ```
-wp-content/plugins/coverkit-usecase-<kebab>/
+coverkit-usecase-<kebab>/
 ├── coverkit-usecase-<kebab>.php
 ├── includes/class-<kebab>-use-case.php
 └── readme.txt
@@ -244,9 +249,10 @@ Only when the user explicitly needs JS/CSS — otherwise skip.
 
 Tell the user:
 
-1. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
-2. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
-3. Map template shapes to the confirmed WordPress fields and preview.
+1. Folder path where the plugin was created (`<base>/coverkit-usecase-<kebab>/`).
+2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
+3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
+4. Map template shapes to the confirmed WordPress fields and preview.
 
 Do **not** commit unless the user asks.
 
@@ -254,6 +260,7 @@ Do **not** commit unless the user asks.
 
 - Scaffold before discovery and user confirmation.
 - Put multiple use cases in one plugin.
-- Create plugins outside `wp-content/plugins/coverkit-usecase-<kebab>/` — each use case is a **top-level** WordPress plugin.
+- Prepend `wp-content/plugins/` to the scaffold path — create `coverkit-usecase-<kebab>/` directly in the confirmed base directory.
+- Put multiple use cases in one plugin folder — each use case is its own **top-level** WordPress plugin directory.
 - Add `define()` constants for version, file, or directory paths — keep the bootstrap minimal.
 - Omit `Requires Plugins: coverkit` or registration on `coverkit_init` priority 5.
