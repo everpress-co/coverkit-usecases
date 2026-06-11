@@ -34,6 +34,7 @@ If you work from the full repository (e.g. to try everything or contribute):
 | Plugin | Use case slug | Purpose | Download |
 | --- | --- | --- | --- |
 | [coverkit-usecase-starter](plugins/coverkit-usecase-starter/) | `starter` | Minimal example — editor preview only, useful as a starting point | [Download zip](https://github.com/everpress-co/coverkit-usecases/releases/latest/download/coverkit-usecase-starter.zip) |
+| [coverkit-usecase-dashboard-widget](plugins/coverkit-usecase-dashboard-widget/) | `dashboard_widget` | Site-wide wp-admin dashboard widget with generated image as background | [Download zip](https://github.com/everpress-co/coverkit-usecases/releases/latest/download/coverkit-usecase-dashboard-widget.zip) |
 
 More use cases will appear here as they are added to the repository.
 
