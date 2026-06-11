@@ -33,7 +33,7 @@ Step-by-step guide to add a custom CoverKit use case in this monorepo.
 | **Label only** | Default dimensions and mappings are fine; no front-end hooks. |
 | **Subclass `CoverKit\Use_Case`** | Custom dimensions, settings schema, mapping sources, or runtime hooks. |
 
-See [`architecture.md`](architecture.md) and CoverKit [custom use case docs](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
+See [`architecture.md`](architecture.md) and CoverKit [custom use case docs](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
 
 ## Plugin header
 

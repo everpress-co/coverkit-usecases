@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: CoverKit Use Case: Starter
- * Plugin URI: https://github.com/everpress/coverkit-usecases
+ * Plugin URI: https://github.com/everpress-co/coverkit-usecases
  * Description: Minimal editor-only test use case for the CoverKit use cases monorepo.
  * Version: 0.1.0
  * Requires at least: 7.0

@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 Scaffold **one new plugin** under `plugins/`. Each plugin = one registered use case. Requires the main CoverKit plugin (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5).
 
-**Reference:** `plugins/coverkit-usecase-starter/` and CoverKit [custom use case docs](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
+**Reference:** `plugins/coverkit-usecase-starter/` and CoverKit [custom use case docs](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
 
 ## When to run
 
@@ -72,7 +72,7 @@ Every bootstrap is a **valid standalone WordPress plugin** with a complete heade
 ```php
 /**
  * Plugin Name: CoverKit Use Case: <Label>
- * Plugin URI: https://github.com/everpress/coverkit-usecases
+ * Plugin URI: https://github.com/everpress-co/coverkit-usecases
  * Description: <One-line purpose>
  * Version: 0.1.0
  * Requires at least: 7.0

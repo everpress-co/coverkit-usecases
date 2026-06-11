@@ -41,7 +41,7 @@ jobs:
             - name: Checkout CoverKit
               uses: actions/checkout@v6
               with:
-                  repository: everpress/coverkit
+                  repository: everpress-co/coverkit
                   ref: develop
                   path: coverkit
 

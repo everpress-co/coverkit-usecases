@@ -1,6 +1,6 @@
 # CoverKit Use Cases
 
-[![Unit tests](https://github.com/everpress/coverkit-usecases/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/everpress/coverkit-usecases/actions/workflows/unit-tests.yml)
+[![Unit tests](https://github.com/everpress-co/coverkit-usecases/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/everpress-co/coverkit-usecases/actions/workflows/unit-tests.yml)
 
 Monorepo for **custom CoverKit use cases**. Each use case lives in its own plugin under `plugins/`, loaded automatically by the root WordPress plugin.
 
@@ -17,7 +17,7 @@ Requires the main [CoverKit](https://coverkit.com) plugin to be installed and ac
 
 ### Single use case (release zip)
 
-1. Download a zip from [Releases](https://github.com/everpress/coverkit-usecases/releases) (e.g. `coverkit-usecase-starter-0.1.0.zip`).
+1. Download a zip from [Releases](https://github.com/everpress-co/coverkit-usecases/releases) (e.g. `coverkit-usecase-starter-0.1.0.zip`).
 2. Extract to `wp-content/plugins/coverkit-usecase-<slug>/`.
 3. Activate the use case plugin (requires **CoverKit**).
 
@@ -29,7 +29,7 @@ See [`docs/create-a-use-case.md`](docs/create-a-use-case.md) for the step-by-ste
 
 Or use the Cursor command **`/new-usecase <slug>`** — it scaffolds from the starter template (see [Agent skills](#agent-skills) below).
 
-CoverKit reference: [Custom use cases](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
+CoverKit reference: [Custom use cases](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
 
 ## Structure
 
@@ -66,12 +66,12 @@ See also [`docs/agents.md`](docs/agents.md), [`AGENTS.md`](AGENTS.md).
 | `composer run docs:skills` | Regenerate Agent skills table in this README |
 | `npm run lint:php` | Same as `composer run lint:php` |
 
-CI checks out [CoverKit `develop`](https://github.com/everpress/coverkit/tree/develop) for PHPUnit.
+CI checks out [CoverKit `develop`](https://github.com/everpress-co/coverkit/tree/develop) for PHPUnit.
 
 ## Releases
 
 - **Monorepo:** clone this repository; activate **CoverKit Use Cases**.
-- **Per use case:** download zips from [Releases](https://github.com/everpress/coverkit-usecases/releases) — one zip per folder in `plugins/coverkit-usecase-*`.
+- **Per use case:** download zips from [Releases](https://github.com/everpress-co/coverkit-usecases/releases) — one zip per folder in `plugins/coverkit-usecase-*`.
 
 Version is synced across `package.json`, `coverkit-usecases.php`, and release tags (`v*`).
 
