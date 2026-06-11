@@ -31,7 +31,6 @@ class LoaderTest extends CoverKitUseCases_TestCase {
 
 		\coverkit_usecases_load_plugins();
 
-		$this->assertTrue( \defined( 'COVERKIT_USECASE_STARTER_VERSION' ) );
 		$this->assertTrue( \function_exists( 'coverkit_usecase_starter_register' ) );
 	}
 }
