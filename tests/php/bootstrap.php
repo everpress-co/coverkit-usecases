@@ -193,7 +193,12 @@ spl_autoload_register(
 );
 
 if ( ! defined( 'COVERKIT_USECASES_VERSION' ) ) {
-	define( 'COVERKIT_USECASES_VERSION', '0.1.0' );
+	$package_json = $usecases_root . '/package.json';
+	$decoded      = json_decode( (string) file_get_contents( $package_json ), true );
+	$version      = ( is_array( $decoded ) && isset( $decoded['version'] ) && is_string( $decoded['version'] ) )
+		? $decoded['version']
+		: '0.0.0';
+	define( 'COVERKIT_USECASES_VERSION', $version );
 }
 
 if ( ! defined( 'COVERKIT_USECASES_FILE' ) ) {
