@@ -81,7 +81,12 @@ foreach ( $plugin_dirs as $plugin_dir ) {
 	$constant_prefix = slug_to_constant_prefix( $slug );
 
 	if ( is_readable( $bootstrap_file ) ) {
-		$updated = sync_bootstrap_file( $bootstrap_file, $version, $constant_prefix );
+		if ( plugin_uses_version_constant( $slug ) ) {
+			$updated = sync_bootstrap_file( $bootstrap_file, $version, $constant_prefix );
+		} else {
+			$updated = sync_bootstrap_header_only( $bootstrap_file, $version );
+		}
+
 		if ( null !== $updated ) {
 			$changes[ $bootstrap_file ] = $updated;
 		}
@@ -220,7 +225,7 @@ function validate_plugin_version_consistency( string $plugin_dir, string $slug )
 		return "Invalid Version in {$bootstrap_file}: {$header_version}";
 	}
 
-	if ( ! preg_match(
+	if ( plugin_uses_version_constant( $slug ) && ! preg_match(
 		"/^define\(\s*'{$constant_prefix}_VERSION',\s*'{$header_version}'\s*\);/m",
 		$contents
 	) ) {
@@ -244,6 +249,18 @@ function validate_plugin_version_consistency( string $plugin_dir, string $slug )
 	}
 
 	return null;
+}
+
+/**
+ * Whether a use case bootstrap defines VERSION/FILE/DIR constants.
+ *
+ * The in-repo starter template stays minimal; release plugins use constants.
+ *
+ * @param string $slug Plugin folder slug.
+ * @return bool
+ */
+function plugin_uses_version_constant( string $slug ): bool {
+	return 'coverkit-usecase-starter' !== $slug;
 }
 
 /**
@@ -278,6 +295,25 @@ function sync_loader_file( string $file, string $version ): ?string {
 	);
 
 	if ( 0 === $header_count || 0 === $constant_count || null === $updated ) {
+		fwrite( STDERR, "Could not update version fields in {$file}\n" );
+		exit( 1 );
+	}
+
+	return $updated === $contents ? null : $updated;
+}
+
+/**
+ * Sync only the Version header in a use case bootstrap.
+ *
+ * @param string $file    Bootstrap path.
+ * @param string $version Target version.
+ * @return string|null Updated file contents or null when unchanged.
+ */
+function sync_bootstrap_header_only( string $file, string $version ): ?string {
+	$contents = (string) file_get_contents( $file );
+	$updated  = preg_replace( '/^(\s*\*\s*Version:\s*).+$/m', '${1}' . $version, $contents, 1, $header_count );
+
+	if ( 0 === $header_count || null === $updated ) {
 		fwrite( STDERR, "Could not update version fields in {$file}\n" );
 		exit( 1 );
 	}

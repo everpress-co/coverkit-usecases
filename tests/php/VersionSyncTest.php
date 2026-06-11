@@ -58,10 +58,13 @@ class VersionSyncTest extends CoverKitUseCases_TestCase {
 		$version  = $headers['Version'] ?? '';
 
 		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+/', $version );
-		$this->assertMatchesRegularExpression(
-			"/define\(\s*'{$constant}',\s*'{$version}'\s*\);/",
-			$contents
-		);
+
+		if ( $this->plugin_uses_version_constant( $slug ) ) {
+			$this->assertMatchesRegularExpression(
+				"/define\(\s*'{$constant}',\s*'{$version}'\s*\);/",
+				$contents
+			);
+		}
 	}
 
 	/**
@@ -112,5 +115,17 @@ class VersionSyncTest extends CoverKitUseCases_TestCase {
 		$without_prefix = preg_replace( '/^coverkit-usecase-/', '', $slug ) ?? $slug;
 
 		return 'COVERKIT_USECASE_' . strtoupper( str_replace( '-', '_', $without_prefix ) );
+	}
+
+	/**
+	 * Whether a use case bootstrap defines VERSION/FILE/DIR constants.
+	 *
+	 * The in-repo starter template stays minimal; release plugins use constants.
+	 *
+	 * @param string $slug Plugin folder slug.
+	 * @return bool
+	 */
+	private function plugin_uses_version_constant( string $slug ): bool {
+		return 'coverkit-usecase-starter' !== $slug;
 	}
 }

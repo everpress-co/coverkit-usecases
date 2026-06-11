@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-
 /**
  * Register the starter use case with CoverKit.
  *
