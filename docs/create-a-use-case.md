@@ -41,6 +41,12 @@ Every bootstrap under `plugins/coverkit-usecase-*/` must include a full WordPres
 
 Use `plugins/coverkit-usecase-starter/coverkit-usecase-starter.php` as the template.
 
+Set `Version:` and `Stable tag:` to the current value in root [`package.json`](../package.json). At release time, `/do-release` bumps the monorepo version and `composer run sync:version` updates every plugin automatically.
+
+### Optional compiled assets
+
+If your use case needs JS/CSS, add a `package.json` with `@wordpress/scripts` in the plugin folder. Release packaging runs `npm run build` and ships `build/` (not `src/`). See [`architecture.md`](architecture.md#release-packaging).
+
 ## Enable in the editor
 
 1. Reload the site (monorepo loader picks up new folders automatically).

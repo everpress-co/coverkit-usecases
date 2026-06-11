@@ -46,6 +46,8 @@ Confirm **label**, **dimensions**, and **editor-only vs front-end hooks** only w
 
 ## Phase 2 — Create plugin files
 
+Read the current monorepo version from root [`package.json`](../../../package.json) (`"version"` field). Use that value for bootstrap `Version:`, the `*_VERSION` constant, and `readme.txt` `Stable tag:` — all plugins inherit the release version; `/do-release` and `composer run sync:version` keep them aligned.
+
 Copy structure from `plugins/coverkit-usecase-starter/` and replace all starter-specific names.
 
 **Label-only use case** (base CoverKit behavior, no custom PHP class):
@@ -74,7 +76,7 @@ Every bootstrap is a **valid standalone WordPress plugin** with a complete heade
  * Plugin Name: CoverKit Use Case: <Label>
  * Plugin URI: https://github.com/everpress-co/coverkit-usecases
  * Description: <One-line purpose>
- * Version: 0.1.0
+ * Version: <package.json version>
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
@@ -89,7 +91,7 @@ Every bootstrap is a **valid standalone WordPress plugin** with a complete heade
 ```
 
 - `declare(strict_types=1);`, `defined( 'ABSPATH' ) || exit;`
-- Version `0.1.0`; define `VERSION`, `FILE`, `DIR` constants with const prefix above.
+- Version from `package.json`; define `VERSION`, `FILE`, `DIR` constants with const prefix above.
 - Register on `coverkit_init` priority **5** only (not `plugins_loaded`). `Requires Plugins: coverkit` ensures CoverKit is active.
 - Use a `coverkit_usecase_<snake>_register()` function hooked to `coverkit_init`; defer `require_once` of subclass files inside that function.
 
@@ -137,7 +139,11 @@ Skip when label-only registration is enough. When needed:
 
 ### readme.txt
 
-- Match plugin name/description; `Stable tag: 0.1.0`; changelog entry for initial release.
+- Match plugin name/description; `Stable tag:` = `package.json` version; changelog entry for initial release.
+
+### Optional asset build
+
+When a use case ships compiled JS/CSS, add `package.json` with `@wordpress/scripts` in the plugin folder (`src/` → `build/`). Release packaging runs `npm ci` + `npm run build` automatically and ships `build/`, not `src/`. Add a `.distignore` for plugin-specific excludes.
 
 ## Phase 3 — Wire up repo
 

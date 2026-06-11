@@ -34,6 +34,10 @@
 		"docs:skills": "@php scripts/generate-skills-table.php",
 		"lint:php": "phpcs",
 		"lint:php:fix": "phpcbf",
+		"package:release": "@php scripts/package-plugins.php",
+		"package:release:verify": "@php scripts/package-plugins.php --verify",
+		"sync:version": "@php scripts/sync-version.php",
+		"sync:version:check": "@php scripts/sync-version.php --check",
 		"test:php": "phpunit --configuration phpunit.xml.dist"
 	}
 }
