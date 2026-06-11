@@ -191,7 +191,7 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 			}
 		';
 
-		\wp_register_style( 'coverkit-dashboard-widget', false );
+		\wp_register_style( 'coverkit-dashboard-widget', false, array(), \md5( $css ) );
 		\wp_enqueue_style( 'coverkit-dashboard-widget' );
 		\wp_add_inline_style( 'coverkit-dashboard-widget', $css );
 	}

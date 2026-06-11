@@ -20,9 +20,17 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'COVERKIT_USECASES_VERSION', '0.1.0' );
-define( 'COVERKIT_USECASES_FILE', __FILE__ );
-define( 'COVERKIT_USECASES_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'COVERKIT_USECASES_VERSION' ) ) {
+	define( 'COVERKIT_USECASES_VERSION', '0.1.0' );
+}
+
+if ( ! defined( 'COVERKIT_USECASES_FILE' ) ) {
+	define( 'COVERKIT_USECASES_FILE', __FILE__ );
+}
+
+if ( ! defined( 'COVERKIT_USECASES_DIR' ) ) {
+	define( 'COVERKIT_USECASES_DIR', plugin_dir_path( __FILE__ ) );
+}
 
 /**
  * Load every use case bootstrap under plugins/coverkit-usecase-{slug}/.

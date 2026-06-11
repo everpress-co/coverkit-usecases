@@ -290,8 +290,8 @@ function sync_loader_file( string $file, string $version ): ?string {
 	$contents = (string) file_get_contents( $file );
 	$updated  = preg_replace( '/^(\s*\*\s*Version:\s*).+$/m', '${1}' . $version, $contents, 1, $header_count );
 	$updated  = preg_replace(
-		"/^define\(\s*'COVERKIT_USECASES_VERSION',\s*'[^']*'\s*\);/m",
-		"define( 'COVERKIT_USECASES_VERSION', '{$version}' );",
+		"/^\s*define\(\s*'COVERKIT_USECASES_VERSION',\s*'[^']*'\s*\);/m",
+		"\tdefine( 'COVERKIT_USECASES_VERSION', '{$version}' );",
 		$updated ?? $contents,
 		1,
 		$constant_count
