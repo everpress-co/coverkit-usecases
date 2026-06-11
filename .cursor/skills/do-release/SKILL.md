@@ -1,6 +1,6 @@
 ---
 name: do-release
-description: Cut a coverkit-usecases monorepo release — bump package.json, sync all use case plugin versions, verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-release or asks to ship a new use cases release.
+description: Cut a use cases release — bump package.json, sync all use case plugin versions, verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-release or asks to ship a new use cases release.
 ---
 
 # CoverKit Use Cases release

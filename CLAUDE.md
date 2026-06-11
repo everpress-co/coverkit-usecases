@@ -4,7 +4,8 @@ Same guidance as [`AGENTS.md`](AGENTS.md). Cursor users: skills live under `.cur
 
 ## Quick links
 
-- Scaffold: `.cursor/skills/new-usecase/SKILL.md` or `/new-usecase <slug>` in Cursor
+- **Standalone (any site):** root [`SKILL.md`](SKILL.md) URL prompt — see [`AGENTS.md`](AGENTS.md)
+- **Monorepo:** `.cursor/skills/new-usecase/SKILL.md` or `/new-usecase <slug>` in Cursor
 - Architecture: `docs/architecture.md`
 - Create a use case: `docs/create-a-use-case.md`
 

@@ -1,14 +1,30 @@
 # Create a use case
 
-Step-by-step guide to add a custom CoverKit use case in this monorepo.
+## Create with an IDE (no install)
 
-## Prerequisites
+For a **standalone** plugin on any WordPress site with CoverKit active, paste this in your IDE agent:
+
+```text
+Read this skill and create a CoverKit use case:
+
+https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
+```
+
+The skill asks follow-up questions (purpose, dimensions, editor vs front-end output, field mappings), confirms a summary, then scaffolds `wp-content/plugins/coverkit-usecase-<slug>/`. See [root `SKILL.md`](../SKILL.md).
+
+---
+
+## Monorepo path
+
+Step-by-step guide to add a custom CoverKit use case in this repository.
+
+### Prerequisites
 
 - [CoverKit](https://coverkit.com) installed and active
 - This repo cloned to `wp-content/plugins/coverkit-usecases/`
 - **CoverKit Use Cases** (root plugin) activated for monorepo development
 
-## Quick path (copy starter)
+### Quick path (copy starter)
 
 1. Copy the starter plugin:
 
@@ -26,16 +42,16 @@ Step-by-step guide to add a custom CoverKit use case in this monorepo.
 
 6. Run `composer run lint:php` and `COVERKIT_PLUGIN_DIR=../coverkit composer run test:php`.
 
-## Label-only vs subclass
+### Label-only vs subclass
 
 | Approach | When to use |
 | --- | --- |
 | **Label only** | Default dimensions and mappings are fine; no front-end hooks. |
 | **Subclass `CoverKit\Use_Case`** | Custom dimensions, settings schema, mapping sources, or runtime hooks. |
 
-See [`architecture.md`](architecture.md) and CoverKit [custom use case docs](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
+See [`architecture.md`](architecture.md) and CoverKit [custom use case docs](https://docs.coverkit.com/user-guide/use-cases/custom-use-case/) ([output profiles](https://docs.coverkit.com/codebase/use-cases-and-output-profiles/)).
 
-## Plugin header
+### Plugin header
 
 Every bootstrap under `plugins/coverkit-usecase-*/` must include a full WordPress plugin header (`Plugin Name`, `Version`, `Requires Plugins: coverkit`, `Text Domain`, etc.) so release zips install as standalone plugins.
 
@@ -47,12 +63,12 @@ Set `Version:` and `Stable tag:` to the current value in root [`package.json`](.
 
 If your use case needs JS/CSS, add a `package.json` with `@wordpress/scripts` in the plugin folder. Release packaging runs `npm run build` and ships `build/` (not `src/`). See [`architecture.md`](architecture.md#release-packaging).
 
-## Enable in the editor
+### Enable in the editor
 
 1. Reload the site (monorepo loader picks up new folders automatically).
 2. Edit a CoverKit template → **Use cases** sidebar → enable your use case.
 3. Map fields and preview.
 
-## Agent scaffolding
+### Agent scaffolding (this repo)
 
-In Cursor, run **`/new-usecase <slug>`** or ask an agent to read [`.cursor/skills/new-usecase/SKILL.md`](../.cursor/skills/new-usecase/SKILL.md).
+In Cursor, run **`/new-usecase <slug>`** or ask an agent to read [`.cursor/skills/new-usecase/SKILL.md`](../.cursor/skills/new-usecase/SKILL.md). For standalone sites, use the [root `SKILL.md`](../SKILL.md) URL prompt instead.

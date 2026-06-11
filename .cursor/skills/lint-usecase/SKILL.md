@@ -2,7 +2,7 @@
 name: lint-usecase
 description: >-
   Run composer lint:php, fix PHPCS issues, verify README use-case table row
-  exists, and regenerate the skills table for coverkit-usecases plugins.
+  exists, and regenerate the skills table for use case plugins in this repository.
 disable-model-invocation: true
 ---
 
@@ -40,7 +40,7 @@ Run before opening a PR or after editing use case PHP in this repo.
 
 ## PHPCS scope
 
-[`/.phpcs.xml`](../../../.phpcs.xml) covers `coverkit-usecases.php` and `plugins/`. Match array alignment and WordPress coding standards (see starter).
+[`/.phpcs.xml`](../../../.phpcs.xml) covers the root loader and `plugins/`. Match array alignment and WordPress coding standards (see starter).
 
 ## CI
 
