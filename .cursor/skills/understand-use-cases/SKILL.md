@@ -25,7 +25,7 @@ coverkit-usecases/
 | Context | How it loads |
 | --- | --- |
 | **Monorepo dev** | Clone into `wp-content/plugins/coverkit-usecases`, activate **CoverKit Use Cases**. Root loader `require_once`s each bootstrap on `plugins_loaded` — WordPress does not scan nested `plugins/`. |
-| **Release zip** | Download from [Releases](https://github.com/everpress/coverkit-usecases/releases), extract to `wp-content/plugins/coverkit-usecase-<slug>/`, activate like any plugin. Each zip has a full WP plugin header and `Requires Plugins: coverkit`. |
+| **Release zip** | Download from [Releases](https://github.com/everpress-co/coverkit-usecases/releases), extract to `wp-content/plugins/coverkit-usecase-<slug>/`, activate like any plugin. Each zip has a full WP plugin header and `Requires Plugins: coverkit`. |
 
 ## Registration API
 
@@ -52,7 +52,7 @@ CoverKit ships built-ins such as `sandbox`, `opengraph`, `featured_image`. Custo
 
 - Base class: `CoverKit\Use_Case` in main plugin `includes/class-coverkit-use-case.php`
 - Registry: `CoverKit\Use_Case_Registry`
-- User guide: [Custom use cases](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md)
+- User guide: [Custom use cases](https://github.com/everpress-co/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md)
 - Example in main plugin: `includes/use-cases/class-coverkit-minimal-use-case.php`
 
 ## Docs in this repo

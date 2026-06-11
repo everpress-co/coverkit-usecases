@@ -1,5 +1,5 @@
 {
-	"name": "everpress/coverkit-usecases",
+	"name": "everpress-co/coverkit-usecases",
 	"description": "Custom CoverKit use cases as separate WordPress plugins.",
 	"type": "project",
 	"license": "GPL-2.0-or-later",
