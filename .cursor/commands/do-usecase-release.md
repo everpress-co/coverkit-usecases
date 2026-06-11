@@ -17,11 +17,11 @@ develop
   → bump package.json, sync loader + changed plugins only, update CHANGELOG
   → package:release:verify + tests
   → checkpoint: summary + ask
-  → (if yes) commit + tag v<version> on release/<version>
+  → (if yes) commit + tag <version> on release/<version>
   → checkpoint: optional push
 ```
 
-Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml) (unit tests, `package:release`, one install-ready zip per use case on the GitHub Release). Tag format: **`v<version>`** (e.g. `v0.1.1`).
+Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml) (unit tests, `package:release`, one install-ready zip per use case on the GitHub Release). Tag format: **`<version>`** — semver **without** a `v` prefix (e.g. `0.1.1`, not `v0.1.1`).
 
 ---
 
@@ -39,8 +39,8 @@ Then **resolve release version** (next section). After resolution:
 
 | Check | Action if fail |
 | --- | --- |
-| **Duplicate branch/tag** | After fetch: `release/<version>` must not exist locally or on `origin`. `git tag -l 'v<version>'` must be empty locally; check remote tags after fetch. → **stop**. |
-| **CHANGELOG ready** | `## [Unreleased]` must have **at least one** bullet (`- ` lines). Empty section → **stop** before branching. |
+| **Duplicate branch/tag** | After fetch: `release/<version>` must not exist locally or on `origin`. `git tag -l '<version>'` must be empty locally; check remote tags after fetch. → **stop**. |
+| **CHANGELOG ready** | `## [Unreleased]` must have **at least one** bullet (`-` lines). Empty section → **stop** before branching. |
 | **Optional bump override** | If the user said `patch`, `minor`, or `major`, use that bump type (see version rules). |
 
 ---
@@ -90,7 +90,7 @@ npm version <release> --no-git-tag-version
    ```
 
    - If `PREV_TAG` is empty (first release), sync all plugins.
-   - Otherwise use `PREV_TAG` as the diff base (e.g. `v0.1.1`).
+   - Otherwise use `PREV_TAG` as the diff base (e.g. `0.1.1`).
 
 2. List changed plugins (for the release summary):
 
@@ -157,7 +157,7 @@ Present a compact summary:
 - Expected GitHub Release assets: `dist/coverkit-usecase-*-<plugin-version>.zip` (one per folder in `plugins/`; version per plugin header)
 - Test / lint / packaging results (pass/fail)
 - Files to be committed (list paths)
-- Planned tag: `v<version>`
+- Planned tag: `<version>`
 
 **Ask explicitly:** “Proceed with commit and tag on `release/<version>`?”
 
@@ -172,7 +172,7 @@ On **`release/<version>`**, stage release-intended files:
 ```bash
 git add package.json package-lock.json CHANGELOG.md coverkit-usecases.php plugins/
 git commit -m "release: <version>"
-git tag v<version>
+git tag <version>
 ```
 
 - **Stop** if a commit hook fails.
@@ -182,13 +182,13 @@ git tag v<version>
 
 ## Checkpoint 2 — push (optional)
 
-Ask: “Push `release/<version>` and tag `v<version>` to origin?”
+Ask: “Push `release/<version>` and tag `<version>` to origin?”
 
 If **yes**:
 
 ```bash
 git push -u origin release/<version>
-git push origin v<version>
+git push origin <version>
 ```
 
 Note: merge `release/<version>` into `develop` or `main` per team policy (do not auto-merge).
@@ -210,8 +210,8 @@ After push, verify:
 
 ## Example invocation
 
-User: **`/do-release`**
+User: **`/do-usecase-release`**
 
-Agent: pre-flight on `develop` → resolve version → `release/<version>` → bump monorepo + sync loader/changed plugins (`--changed-since`) + CHANGELOG → verify → summary → user “proceed” → commit + tag `v<version>` → optional push ask.
+Agent: pre-flight on `develop` → resolve version → `release/<version>` → bump monorepo + sync loader/changed plugins (`--changed-since`) + CHANGELOG → verify → summary → user “proceed” → commit + tag `<version>` → optional push ask.
 
-User: **`/do-release minor`** — force minor bump.
+User: **`/do-usecase-release minor`** — force minor bump.

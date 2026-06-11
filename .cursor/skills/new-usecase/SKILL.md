@@ -46,7 +46,7 @@ Confirm **label**, **dimensions**, and **editor-only vs front-end hooks** only w
 
 ## Phase 2 — Create plugin files
 
-Read the current release version from root [`package.json`](../../../package.json) (`"version"` field). Use that value for bootstrap `Version:`, the `*_VERSION` constant, and `readme.txt` `Stable tag:` — `/do-release` and `composer run sync:version` keep them aligned.
+Read the current release version from root [`package.json`](../../../package.json) (`"version"` field). Use that value for bootstrap `Version:`, the `*_VERSION` constant, and `readme.txt` `Stable tag:` — `/do-usecase-release` and `composer run sync:version` keep them aligned.
 
 Copy structure from `plugins/coverkit-usecase-starter/` and replace all starter-specific names.
 

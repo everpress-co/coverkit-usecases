@@ -49,9 +49,9 @@ composer run package:release:verify
 | Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` |
 | Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` |
 
-At release time, use `composer run sync:version -- --changed-since vX.Y.Z` so only plugins with changes since the previous tag are bumped. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
+At release time, use `composer run sync:version -- --changed-since X.Y.Z` so only plugins with changes since the previous tag are bumped. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
 
-**Cut a release:** use **`/do-release`** in Cursor (see [`.cursor/commands/do-release.md`](.cursor/commands/do-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
+**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `X.Y.Z` (no `v` prefix).
 
 Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **two zips per folder** in `plugins/coverkit-usecase-*`: a versioned archive (`<slug>-<version>.zip`) and a stable alias (`<slug>.zip`) for README download links via `releases/latest/download/<slug>.zip`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 

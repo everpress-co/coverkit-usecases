@@ -10,7 +10,7 @@ Read this skill and create a CoverKit use case:
 https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 ```
 
-The skill asks follow-up questions (purpose, dimensions, editor vs front-end output, field mappings), confirms a summary, then scaffolds `wp-content/plugins/coverkit-usecase-<slug>/`. See [root `SKILL.md`](../SKILL.md).
+The skill asks follow-up questions (purpose, editor vs front-end output, field mappings), infers dimensions from your use case, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the directory where you invoked it (usually your WordPress `plugins/` folder). See [root `SKILL.md`](../SKILL.md).
 
 ---
 
@@ -57,7 +57,7 @@ Every bootstrap under `plugins/coverkit-usecase-*/` must include a full WordPres
 
 Use `plugins/coverkit-usecase-starter/coverkit-usecase-starter.php` as the template.
 
-Set `Version:` and `Stable tag:` to the current value in root [`package.json`](../package.json). At release time, `/do-release` bumps the monorepo version and `composer run sync:version` updates every plugin automatically.
+Set `Version:` and `Stable tag:` to the current value in root [`package.json`](../package.json). At release time, `/do-usecase-release` bumps the monorepo version and `composer run sync:version` updates every plugin automatically.
 
 ### Optional compiled assets
 

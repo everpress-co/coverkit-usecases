@@ -1,11 +1,11 @@
 ---
-name: do-release
-description: Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-release or asks to ship a new use cases release.
+name: do-usecase-release
+description: Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag X.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-usecase-release or asks to ship a new use cases release.
 ---
 
 # CoverKit Use Cases release
 
-Follow [`.cursor/commands/do-release.md`](../../commands/do-release.md) exactly.
+Follow [`.cursor/commands/do-usecase-release.md`](../../commands/do-usecase-release.md) exactly.
 
 ## Quick reference
 
@@ -15,7 +15,7 @@ Follow [`.cursor/commands/do-release.md`](../../commands/do-release.md) exactly.
 | Version source | [`package.json`](../../../package.json) |
 | Sync | `composer run sync:version -- --changed-since <prev-tag>` after `npm version` (loader always; plugins only when `git diff` shows changes) |
 | Packages | `composer run package:release:verify` before tag |
-| Tag | `v<version>` (e.g. `v0.1.1`) |
+| Tag | `<version>` (e.g. `0.1.1` — no `v` prefix) |
 | CI | [`.github/workflows/release.yml`](../../../.github/workflows/release.yml) attaches one zip per `plugins/coverkit-usecase-*` |
 
 ## Not for
@@ -26,4 +26,3 @@ Follow [`.cursor/commands/do-release.md`](../../commands/do-release.md) exactly.
 ## Related
 
 - [`CONTRIBUTING.md`](../../../CONTRIBUTING.md) — version sync and release tags
-- Main CoverKit `/do-release` — different repo; do not mix tag formats (CoverKit has no `v` prefix; usecases uses `v`).
