@@ -8,7 +8,7 @@ Custom [CoverKit](https://coverkit.com) use cases you can install on your WordPr
 
 ### From a release zip (recommended)
 
-1. Open [Releases](https://github.com/everpress-co/coverkit-usecases/releases) and download the zip for the use case you want (e.g. `coverkit-usecase-starter-0.1.0.zip`).
+1. Download the latest zip from the [Available use cases](#available-use-cases) table below (or browse [Releases](https://github.com/everpress-co/coverkit-usecases/releases) for versioned archives).
 2. In WordPress, go to **Plugins → Add New → Upload Plugin**, upload the zip, and activate it.
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case and map your fields.
 
@@ -31,9 +31,9 @@ If you work from the full repository (e.g. to try everything or contribute):
 
 ## Available use cases
 
-| Plugin | Use case slug | Purpose |
-| --- | --- | --- |
-| [coverkit-usecase-starter](plugins/coverkit-usecase-starter/) | `starter` | Minimal example — editor preview only, useful as a starting point |
+| Plugin | Use case slug | Purpose | Download |
+| --- | --- | --- | --- |
+| [coverkit-usecase-starter](plugins/coverkit-usecase-starter/) | `starter` | Minimal example — editor preview only, useful as a starting point | [Download zip](https://github.com/everpress-co/coverkit-usecases/releases/latest/download/coverkit-usecase-starter.zip) |
 
 More use cases will appear here as they are added to the repository.
 

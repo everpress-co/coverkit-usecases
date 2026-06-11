@@ -74,7 +74,7 @@ flowchart LR
    - stage production files only (excludes `src/`, `node_modules/`, tests, dev config)
    - zip with **folder root** `<slug>/` so WordPress can install from **Plugins → Add New → Upload**
 
-CI runs `composer run package:release` on tag push; assets attach to the GitHub Release. The monorepo loader is **not** zipped — releases target standalone per-use-case installs.
+CI runs `composer run package:release` on tag push; assets attach to the GitHub Release (versioned zip plus a `{slug}.zip` alias for stable `releases/latest/download/` URLs in the README). The monorepo loader is **not** zipped — releases target standalone per-use-case installs.
 
 ## Further reading
 

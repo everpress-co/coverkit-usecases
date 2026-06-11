@@ -147,7 +147,7 @@ When a use case ships compiled JS/CSS, add `package.json` with `@wordpress/scrip
 
 ## Phase 3 — Wire up (this repository only)
 
-1. Add a row to the **Use cases** table in root [`README.md`](../../../README.md).
+1. Add a row to the **Use cases** table in root [`README.md`](../../../README.md), including a **Download** link: `https://github.com/everpress-co/coverkit-usecases/releases/latest/download/coverkit-usecase-<slug>.zip`.
 2. Run `composer run docs:skills` to refresh the contributor skills table in AGENTS.md.
 3. Run `composer run lint:php` from repo root and fix any PHPCS issues.
 
