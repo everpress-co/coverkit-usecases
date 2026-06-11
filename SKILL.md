@@ -381,18 +381,18 @@ https://example.com/wp-json/coverkit/v1/use-case/email_header/123/456.jpg
 
 The response is the image bytes (generated on first request, then cached). Use this URL in `<img src="…">`, meta tags, newsletters, or any HTTP client.
 
-**Build the URL in PHP** with `\CoverKit\coverkit_rest_use_case_image_url()`:
+**Build the URL in PHP** from a `CoverKit\Use_Case` subclass with `static::get_image_url()` (resolves slug and assigned `format` automatically):
 
 ```php
-$image_url = \CoverKit\coverkit_rest_use_case_image_url(
- '<snake>',   // registered use-case slug
- 123,         // CoverKit template post ID
- 456,         // source post ID (field data comes from here)
- 'jpg',       // extension — match recommended formats
- null,        // optional ?width= (privileged users only)
- false        // false = public URL without _wpnonce (meta tags, crawlers)
+$image_url = static::get_image_url(
+ 123,    // CoverKit template post ID
+ 456,    // source post ID (field data comes from here; 0 for site-level)
+ null,   // optional ?width= (privileged users only)
+ false   // false = public URL without _wpnonce (meta tags, crawlers)
 );
 ```
+
+Lower-level fallback when you are not inside a use case class: `\CoverKit\coverkit_rest_use_case_image_url( '<snake>', $template_id, $post_id, 'jpg', null, false )`.
 
 | Where the image is used | Registration | Last argument to helper |
 | --- | --- | --- |
@@ -425,14 +425,7 @@ public function inject_meta(): void {
  $post_id     = (int) get_queried_object_id();
  $template_id = 123; // TODO: resolve enabled template for this use case + post
 
- $image_url = \CoverKit\coverkit_rest_use_case_image_url(
-  static::get_slug(),
-  $template_id,
-  $post_id,
-  'jpg',
-  null,
-  false
- );
+ $image_url = static::get_image_url( $template_id, $post_id, null, false );
 
  echo '<meta property="og:image" content="' . esc_url( $image_url ) . "\" />\n";
 }
@@ -462,7 +455,7 @@ Tell the user:
 2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
 4. Map template shapes to the confirmed WordPress fields and preview.
-5. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `\CoverKit\coverkit_rest_use_case_image_url()` in PHP. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
+5. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `static::get_image_url()` in your use case class. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
 
 Do **not** commit unless the user asks.
 
