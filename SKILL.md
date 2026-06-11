@@ -2,7 +2,7 @@
 name: create-coverkit-use-case
 description: >-
   Guide discovery of CoverKit use case requirements, then scaffold a standalone
-  WordPress plugin. Use when asked to create a CoverKit use case or custom image output.
+  WordPress plugin. Use when asked to create a CoverKit use case or custom image preset.
 ---
 
 # Create a CoverKit use case
@@ -18,6 +18,7 @@ Scaffold **one standalone WordPress plugin** that registers a custom CoverKit us
 - [Custom use cases (developers)](https://docs.coverkit.com/user-guide/use-cases/custom-use-case/)
 - [Use cases and output profiles](https://docs.coverkit.com/codebase/use-cases-and-output-profiles/)
 - [Hooks and extension points](https://docs.coverkit.com/codebase/hooks-and-extension-points/)
+- [REST API](https://docs.coverkit.com/codebase/rest-api/) — stable URLs for generated use-case images
 - [How to configure use cases (editor)](https://docs.coverkit.com/user-guide/use-cases/how-to-configure/)
 - [Community use case plugins (examples)](https://github.com/everpress-co/coverkit-usecases/tree/main/plugins)
 
@@ -80,24 +81,25 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 
 | # | Question | Why |
 | --- | --- | --- |
-| 1 | **What is this use case for?** — Describe the image output and where it will be used (e.g. email newsletter header, LinkedIn share, product card). | Drives label, slug, purpose, and inferred output settings |
-| 2 | **Editor only or front-end output?** — Preview/download in the template editor only, or also inject meta tags / replace featured images / other runtime hooks on the live site? | Label-only vs subclass + `init()` hooks |
-| 3 | **Plugin author metadata** — **Author** name, **Author URI** (your site), and optional **Plugin URI** (project/repo link). Suggest values you can infer (see below); user confirms or overrides. | WordPress plugin header |
+| 1 | **What is this use case for?** — A clear description of the goal, context, and where the image matters (e.g. "header graphic for Mailchimp newsletters — editors preview and download in the template editor" or "LinkedIn share image on single posts, injected as `og:image`"). | Drives label, slug, purpose, dimensions, mappings, and label-only vs subclass |
+| 2 | **Plugin author metadata** — **Author** name, **Author URI** (your site), and optional **Plugin URI** (project/repo link). Suggest values you can infer (see below); user confirms or overrides. | WordPress plugin header |
+
+**Do not ask for "output" separately** — dimensions, crop, formats, editor-only vs front-end behavior, and field mappings depend on the use case. Infer them from a good description; ask follow-ups only when the description leaves gaps.
 
 ### Follow-up questions (when relevant)
 
 | Trigger | Question |
 | --- | --- |
-| Front-end output chosen | **Where should the image appear?** (e.g. `<meta property="og:image">`, featured image, custom action) |
-| Any use case | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
+| Runtime behavior unclear from description | **Where should the image be used?** — Template editor preview/download only, or also on the live site (e.g. `<meta property="og:image">`, featured image, custom hook)? |
+| Mapping needs unclear | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
 | Target folder unclear | **Where should the plugin folder be created?** Default: current directory → `coverkit-usecase-<kebab>/`. If the user wants a different parent (e.g. `wp-content/plugins/`), use that path and create missing parent folders first. |
-| Output size ambiguous | **Dimensions, crop, or formats** — only when the use case description does not imply a standard size (see below). Propose sensible values first; ask to confirm or override. |
+| Size or format still ambiguous after inference | **Dimensions, crop, or formats** — propose sensible values first from the description and examples below; ask only to confirm or override. |
 
-### Infer output settings (do not lead with dimensions)
+### Infer from the description (do not ask for output upfront)
 
-Decide **dimensions, crop, and formats** from the described use case and examples in **Explore existing examples**. Ask only when unclear or the user wants something non-standard.
+From a good use case description, decide **dimensions, crop, formats, editor-only vs front-end behavior, and field mappings** using examples in **Explore existing examples**. State your inferences in the Phase 1 summary so the user can correct them — ask follow-ups only when the description is vague or non-standard.
 
 | Use case type | Typical inference |
 | --- | --- |
@@ -125,11 +127,12 @@ Infer when possible; always let the user override.
 
 ### Rules for asking
 
+- **Expect a good description** — purpose, context, and where the image matters. That is enough to infer most technical choices.
 - Batch questions in **one message** when possible.
 - Skip follow-ups already answered in the user's first reply.
-- If the user gave a rich description upfront, acknowledge it and only ask **gaps**.
-- When the request is vague, suggest 2–3 concrete use case ideas from **Explore existing examples** before asking core questions.
-- Do **not** ask for dimensions, crop, or formats upfront — infer them from the use case description; ask only if ambiguous.
+- If the user gave a rich description upfront, acknowledge it and only ask **gaps** (usually author metadata and folder path).
+- When the request is vague, suggest 2–3 concrete use case ideas from **Explore existing examples**, then ask for a clearer description — not a separate "output" questionnaire.
+- Do **not** ask for dimensions, crop, formats, or editor-vs-front-end upfront — infer them from the description; ask only if ambiguous.
 
 ## Phase 1 — Confirm before scaffold
 
@@ -315,7 +318,7 @@ protected static function use_case_mapping_sources(): array {
 }
 ```
 
-**Example `init()`** (only when front-end output was confirmed):
+**Example `init()`** (only when front-end behavior was confirmed in discovery):
 
 ```php
 protected function init(): void {
@@ -324,6 +327,87 @@ protected function init(): void {
 ```
 
 Implement hook methods on the subclass; validate output applies to the current request.
+
+### Using the generated image (REST API)
+
+CoverKit serves generated use-case images at a **built-in REST route** — your plugin does not register its own endpoint.
+
+```text
+GET /wp-json/coverkit/v1/use-case/{slug}/{template_id}/{post_id}.{extension}
+```
+
+Example for slug `email_header`, template `123`, post `456`:
+
+```text
+https://example.com/wp-json/coverkit/v1/use-case/email_header/123/456.jpg
+```
+
+The response is the image bytes (generated on first request, then cached). Use this URL in `<img src="…">`, meta tags, newsletters, or any HTTP client.
+
+**Build the URL in PHP** with `\CoverKit\coverkit_rest_use_case_image_url()`:
+
+```php
+$image_url = \CoverKit\coverkit_rest_use_case_image_url(
+ '<snake>',   // registered use-case slug
+ 123,         // CoverKit template post ID
+ 456,         // source post ID (field data comes from here)
+ 'jpg',       // extension — match recommended formats
+ null,        // optional ?width= (privileged users only)
+ false        // false = public URL without _wpnonce (meta tags, crawlers)
+);
+```
+
+| Where the image is used | Registration | Last argument to helper |
+| --- | --- | --- |
+| Editor preview / admin only | default (`public` omitted) | `true` (default) — appends `_wpnonce` |
+| Live site, meta tags, public `<img>` | `'public' => true` in `coverkit_register_use_case()` | `false` — no nonce so anonymous clients work |
+
+When front-end or meta-tag use was confirmed in discovery, register as public:
+
+```php
+\CoverKit\coverkit_register_use_case(
+ '<snake>',
+ array(
+  'label'  => __( '<Label>', 'coverkit-usecase-<kebab>' ),
+  'public' => true,
+  'class'  => \CoverKitUseCase<Studly>\<Wp_Class>::class,
+ )
+);
+```
+
+Public URLs are only served for **published, viewable** posts (drafts return 404 for anonymous visitors). See [REST API](https://docs.coverkit.com/codebase/rest-api/) and filter `coverkit_use_case_public_image_permission` for edge cases.
+
+**Example `inject_meta()`** (front-end meta tag — resolve `$template_id` from your assignment logic; study CoverKit’s Open Graph use case for full template matching):
+
+```php
+public function inject_meta(): void {
+ if ( ! is_singular( 'post' ) ) {
+  return;
+ }
+
+ $post_id     = (int) get_queried_object_id();
+ $template_id = 123; // TODO: resolve enabled template for this use case + post
+
+ $image_url = \CoverKit\coverkit_rest_use_case_image_url(
+  static::get_slug(),
+  $template_id,
+  $post_id,
+  'jpg',
+  null,
+  false
+ );
+
+ echo '<meta property="og:image" content="' . esc_url( $image_url ) . "\" />\n";
+}
+```
+
+**Smoke test** after enabling the use case on a template and publishing a post:
+
+```bash
+curl -I "https://example.com/wp-json/coverkit/v1/use-case/<snake>/123/456.jpg"
+```
+
+Expect `200` and an `image/*` content type. Open the same URL in a browser to view the image.
 
 ### readme.txt (optional)
 
@@ -341,6 +425,7 @@ Tell the user:
 2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
 4. Map template shapes to the confirmed WordPress fields and preview.
+5. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `\CoverKit\coverkit_rest_use_case_image_url()` in PHP. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
 
 Do **not** commit unless the user asks.
 
