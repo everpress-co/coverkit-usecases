@@ -40,8 +40,20 @@ foreach ( $plugin_dirs as $plugin_dir ) {
 	$bootstrap_file  = $plugin_dir . '/' . $slug . '.php';
 	$plugin_version  = read_plugin_version( $bootstrap_file );
 	$zip_path        = package_plugin( $repo_root, $plugin_dir, $slug, $plugin_version, $staging_dir, $dist_dir );
+	$alias_path      = $dist_dir . '/' . $slug . '.zip';
 	$zip_paths[ $slug ] = $zip_path;
+
+	if ( is_file( $alias_path ) ) {
+		unlink( $alias_path );
+	}
+
+	if ( ! copy( $zip_path, $alias_path ) ) {
+		fwrite( STDERR, "Failed to create latest alias zip for {$slug}\n" );
+		exit( 1 );
+	}
+
 	fwrite( STDOUT, "Created {$zip_path}\n" );
+	fwrite( STDOUT, "Created {$alias_path}\n" );
 }
 
 if ( $verify_only ) {

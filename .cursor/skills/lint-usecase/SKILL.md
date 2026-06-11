@@ -24,7 +24,7 @@ Run before opening a PR or after editing use case PHP in this repo.
    composer run lint:php:fix
    ```
 
-3. Verify the **Use cases** table in [`README.md`](../../../README.md) lists every `plugins/coverkit-usecase-*` folder (slug + purpose).
+3. Verify the **Use cases** table in [`README.md`](../../../README.md) lists every `plugins/coverkit-usecase-*` folder (slug, purpose, and a **Download** link to `releases/latest/download/<slug>.zip`).
 
 4. Regenerate the contributor skills table in AGENTS.md:
 

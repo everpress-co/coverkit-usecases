@@ -53,7 +53,7 @@ At release time, use `composer run sync:version -- --changed-since vX.Y.Z` so on
 
 **Cut a release:** use **`/do-release`** in Cursor (see [`.cursor/commands/do-release.md`](.cursor/commands/do-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
 
-Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **one zip per folder** in `plugins/coverkit-usecase-*`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
+Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **two zips per folder** in `plugins/coverkit-usecase-*`: a versioned archive (`<slug>-<version>.zip`) and a stable alias (`<slug>.zip`) for README download links via `releases/latest/download/<slug>.zip`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 
 ## Changelog
 
