@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-06-11
+
 - fixed: dashboard widget shows one wp-admin widget per template with the use case enabled
 - added: dashboard widget use case — site-wide wp-admin widget with a CoverKit generated image as the background
 
