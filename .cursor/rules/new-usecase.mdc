@@ -54,13 +54,16 @@ plugins/coverkit-usecase-<kebab>/
 └── readme.txt
 ```
 
-### Main plugin file
+### Bootstrap file (`coverkit-usecase-<kebab>.php`)
 
-- Standard WordPress plugin headers; `Text Domain` = text domain above.
+- **No** WordPress `Plugin Name` header — loaded by root `coverkit-usecases.php`, not activated separately.
+- File docblock: “loaded by CoverKit Use Cases”.
+- `Text Domain` = text domain above (for `\__()` calls).
 - `declare(strict_types=1);`, `defined( 'ABSPATH' ) || exit;`
 - Version `0.1.0`; define `VERSION`, `FILE`, `DIR` constants.
-- Require the use case class from `includes/`.
-- On `plugins_loaded` (priority 20): if `CoverKit\coverkit_register_use_case` missing → admin notice; else hook `coverkit_init` priority **5** and register:
+- On `plugins_loaded` (priority 20): if `CoverKit\coverkit_register_use_case` or `CoverKit\Use_Case` missing → return; else `require_once` the use case class from `includes/`, hook `coverkit_init` priority **5**, and register:
+
+**Do not** `require_once` the use case class at file top level — `Use_Case` is only available after CoverKit has loaded.
 
 ```php
 \CoverKit\coverkit_register_use_case(
@@ -85,23 +88,18 @@ plugins/coverkit-usecase-<kebab>/
 
 ## Phase 3 — Wire up repo
 
-1. Add a row to the **Plugins** table in root [`README.md`](../../README.md).
-2. Run from repo root:
+1. Add a row to the **Use cases** table in root [`README.md`](../../README.md).
+2. Run `composer run lint:php` from repo root and fix any PHPCS issues.
 
-```bash
-./bin/link-local.sh
-composer run lint:php
-```
-
-Fix any PHPCS issues before finishing.
+No symlink or plugin re-activation needed — root [`coverkit-usecases.php`](../../coverkit-usecases.php) auto-loads new folders under `plugins/`.
 
 ## Phase 4 — Summarize for user
 
 Tell the user:
 
-- Plugin path and symlink target
+- Folder path under `plugins/`
 - Use case slug and label to find in the CoverKit template editor
-- Activate **CoverKit** + the new plugin in WordPress if not already active
+- Ensure **CoverKit** and **CoverKit Use Cases** are active (only the root plugin needs activation)
 
 Do **not** commit unless the user asks.
 
