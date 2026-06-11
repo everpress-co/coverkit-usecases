@@ -91,7 +91,8 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | # | Question | Why |
 | --- | --- | --- |
 | 1 | **What is this use case for?** — A clear description of the goal, context, and where the image matters (e.g. "header graphic for Mailchimp newsletters — editors preview and download in the template editor" or "LinkedIn share image on single posts, injected as `og:image`"). | Drives label, slug, purpose, dimensions, mappings, and label-only vs subclass |
-| 2 | **Plugin author metadata** — **Author** name, **Author URI** (your site), and optional **Plugin URI** (project/repo link). Suggest values you can infer (see below); user confirms or overrides. | WordPress plugin header |
+
+**Do not ask for plugin author metadata** — infer **Author**, **Author URI**, and **Plugin URI** silently (see below). Omit header lines when unknown.
 
 **Do not ask for "output" separately** — dimensions, crop, formats, editor-only vs front-end behavior, and field mappings depend on the use case. Infer them from a good description; ask follow-ups only when the description leaves gaps.
 
@@ -124,22 +125,22 @@ From a good use case description, decide **dimensions, crop, formats, editor-onl
 
 When inferring, state your proposal in the Phase 1 summary (“LinkedIn share → 1200×627, cropped”) so the user can correct it — do not block discovery on pixel-perfect answers upfront.
 
-### Suggested author metadata (propose, then confirm)
+### Author metadata (infer silently — never ask)
 
-Infer when possible; always let the user override.
+Fill the WordPress plugin header from the environment when you can; **omit the header line** when a value is unknown. Do not include author fields in discovery questions or the Phase 1 confirmation unless the user volunteered them.
 
-| Field | Where to look | Example fallback |
+| Field | Where to look | If unknown |
 | --- | --- | --- |
-| **Author** | `git config user.name`, workspace/site branding, user’s first reply | Ask if nothing reliable |
-| **Author URI** | Site URL in the project (`WP_HOME`, `siteurl` in config, package.json `homepage`, README links) | Ask if unknown |
-| **Plugin URI** | User’s repo URL, project homepage, or omit | Leave empty if user has no preference |
+| **Author** | `git config user.name`, workspace/site branding | Omit `Author:` line |
+| **Author URI** | Site URL in the project (`WP_HOME`, `siteurl` in config, package.json `homepage`, README links) | Omit `Author URI:` line |
+| **Plugin URI** | Git remote URL, project homepage | Omit `Plugin URI:` line |
 
 ### Rules for asking
 
 - **Expect a good description** — purpose, context, and where the image matters. That is enough to infer most technical choices.
 - Batch questions in **one message** when possible.
 - Skip follow-ups already answered in the user's first reply.
-- If the user gave a rich description upfront, acknowledge it and only ask **gaps** (usually author metadata and folder path).
+- If the user gave a rich description upfront, acknowledge it and only ask **gaps** (usually folder path when ambiguous).
 - When the request is vague, suggest 2–3 concrete use case ideas from **Explore existing examples**, then ask for a clearer description — not a separate "output" questionnaire.
 - Do **not** ask for dimensions, crop, formats, or editor-vs-front-end upfront — infer them from the description; ask only if ambiguous.
 
@@ -185,7 +186,6 @@ Summarize in plain language:
 - Field mappings (required / optional)
 - Front-end behavior (if any)
 - Scaffold target: **in place** at `./` or **subfolder** at `<base>/coverkit-usecase-<kebab>/` (state which mode and the resolved path)
-- Plugin **Author**, **Author URI**, and **Plugin URI** (if any)
 
 Ask: **“Does this match what you need?”** Proceed only after yes (or user adjusts).
 
@@ -203,9 +203,9 @@ From confirmed answers:
 | **namespace** | `CoverKitUseCase<Studly>` (subclass only) | `CoverKitUseCaseEmailHeader` |
 | **text domain** | same as plugin folder | `coverkit-usecase-email-header` |
 | **label** | user-facing title | `Email header` |
-| **author** | confirmed Author header | `Jane Doe` |
-| **author_uri** | confirmed Author URI | `https://example.com` |
-| **plugin_uri** | confirmed Plugin URI or empty | `https://github.com/janedoe/coverkit-usecase-email-header` |
+| **author** | inferred; omit header line if empty | `Jane Doe` |
+| **author_uri** | inferred; omit header line if empty | `https://example.com` |
+| **plugin_uri** | inferred; omit header line if empty | `https://github.com/janedoe/coverkit-usecase-email-header` |
 
 ### Slug validation
 
@@ -249,7 +249,7 @@ coverkit-usecase-<kebab>/
 
 ### Bootstrap file (`coverkit-usecase-<kebab>.php`)
 
-One file with a WordPress plugin header and registration on `coverkit_init` priority **5**. No version/path constants — use `plugin_dir_path( __FILE__ )` only when loading a subclass.
+One file with a WordPress plugin header and registration on `coverkit_init` priority **5**. No version/path constants — use `plugin_dir_path( __FILE__ )` only when loading a subclass. Include **Author**, **Author URI**, and **Plugin URI** lines only when inferred — omit each line entirely when unknown.
 
 **Label only:**
 
@@ -257,12 +257,9 @@ One file with a WordPress plugin header and registration on `coverkit_init` prio
 <?php
 /**
  * Plugin Name: CoverKit Use Case: <Label>
- * Plugin URI: <plugin_uri or omit this line>
  * Description: <One-line purpose from discovery>
  * Version: 1.0.0
  * Requires Plugins: coverkit
- * Author: <author>
- * Author URI: <author_uri>
  * Text Domain: coverkit-usecase-<kebab>
  */
 
@@ -290,12 +287,9 @@ add_action(
 <?php
 /**
  * Plugin Name: CoverKit Use Case: <Label>
- * Plugin URI: <plugin_uri or omit this line>
  * Description: <One-line purpose from discovery>
  * Version: 1.0.0
  * Requires Plugins: coverkit
- * Author: <author>
- * Author URI: <author_uri>
  * Text Domain: coverkit-usecase-<kebab>
  */
 
