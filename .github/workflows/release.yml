@@ -2,88 +2,88 @@
 name: Create Release
 
 on:
-    workflow_dispatch:
-        inputs:
-            version:
-                description: Release version (e.g. 0.1.1) — required when not triggered by a tag
-                required: false
-                type: string
-    push:
-        tags:
-            - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (e.g. 0.1.1) — required when not triggered by a tag
+        required: false
+        type: string
+  push:
+    tags:
+      - "*"
 
 permissions:
-    contents: write
+  contents: write
 
 jobs:
-    unit-tests:
-        uses: ./.github/workflows/unit-tests-reusable.yml
-        secrets: inherit
+  unit-tests:
+    uses: ./.github/workflows/unit-tests-reusable.yml
+    secrets: inherit
 
-    create-release:
-        name: Create per-use-case release zips
-        needs: unit-tests
-        runs-on: ubuntu-latest
+  create-release:
+    name: Create per-use-case release zips
+    needs: unit-tests
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v6
-              with:
-                  fetch-depth: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version-file: .nvmrc
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
 
-            - name: Resolve version
-              id: version
-              run: |
-                  if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-                    VERSION="${GITHUB_REF#refs/tags/v}"
-                    TAG_NAME="${GITHUB_REF_NAME}"
-                  elif [[ -n "${{ github.event.inputs.version }}" ]]; then
-                    VERSION="${{ github.event.inputs.version }}"
-                    TAG_NAME="v${VERSION}"
-                  else
-                    echo "workflow_dispatch requires a version input when not triggered by a tag" >&2
-                    exit 1
-                  fi
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            TAG_NAME="${GITHUB_REF_NAME}"
+          elif [[ -n "${{ github.event.inputs.version }}" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+            TAG_NAME="v${VERSION}"
+          else
+            echo "workflow_dispatch requires a version input when not triggered by a tag" >&2
+            exit 1
+          fi
 
-                  if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
-                    echo "Could not resolve release version" >&2
-                    exit 1
-                  fi
+          if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+            echo "Could not resolve release version" >&2
+            exit 1
+          fi
 
-                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-                  echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
 
-            - name: Install Composer dependencies
-              run: composer install --no-interaction --prefer-dist
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
 
-            - name: Build per-use-case zips
-              run: composer run package:release
+      - name: Build per-use-case zips
+        run: composer run package:release
 
-            - name: Extract changelog section
-              id: changelog
-              run: |
-                  VERSION="${{ steps.version.outputs.version }}"
-                  awk -v ver="$VERSION" '
-                    $0 ~ "^## \\[" ver "\\]" { found=1; next }
-                    found && /^## \[/ { exit }
-                    found { print }
-                  ' CHANGELOG.md > release-notes.md
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
 
-                  if [[ ! -s release-notes.md ]]; then
-                    echo "Release notes for version ${VERSION} not found in CHANGELOG.md" >&2
-                    exit 1
-                  fi
+          if [[ ! -s release-notes.md ]]; then
+            echo "Release notes for version ${VERSION} not found in CHANGELOG.md" >&2
+            exit 1
+          fi
 
-            - name: Create GitHub Release
-              uses: softprops/action-gh-release@v3
-              with:
-                  tag_name: ${{ steps.version.outputs.tag_name }}
-                  name: v${{ steps.version.outputs.version }}
-                  body_path: release-notes.md
-                  files: dist/*.zip
-                  fail_on_unmatched_files: true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          name: v${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          files: dist/*.zip
+          fail_on_unmatched_files: true
