@@ -2,6 +2,7 @@
 <ruleset name="CoverKit Use Cases Coding Standards">
 	<description>PHP coding standards for CoverKit custom use case plugins.</description>
 
+	<file>coverkit-usecases.php</file>
 	<file>plugins</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
@@ -11,13 +12,9 @@
 	<arg name="colors"/>
 	<arg value="sp"/>
 
-	<config name="testVersion" value="8.0-8.4"/>
-
 	<rule ref="WordPress">
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
 		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
 	</rule>
-
-	<rule ref="PHPCompatibilityWP"/>
 </ruleset>

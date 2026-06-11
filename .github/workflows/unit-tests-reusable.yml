@@ -1,0 +1,89 @@
+---
+name: Unit tests (reusable)
+
+on:
+    workflow_call:
+
+jobs:
+    lint-php:
+        name: PHP lint (PHPCS)
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  extensions: mbstring
+                  coverage: none
+
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@v4
+              with:
+                  composer-options: '--prefer-dist --no-interaction --no-scripts'
+
+            - name: Run PHPCS
+              run: composer run lint:php
+
+    php-unit:
+        name: PHP unit tests
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        steps:
+            - name: Checkout use cases
+              uses: actions/checkout@v6
+
+            - name: Checkout CoverKit
+              uses: actions/checkout@v6
+              with:
+                  repository: everpress-co/coverkit
+                  ref: develop
+                  path: coverkit
+                  token: ${{ secrets.COVERKIT_CHECKOUT_TOKEN }}
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  extensions: mbstring
+                  coverage: none
+
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@v4
+              with:
+                  composer-options: '--prefer-dist --no-interaction --no-scripts'
+
+            - name: Run PHPUnit
+              env:
+                  COVERKIT_PLUGIN_DIR: ${{ github.workspace }}/coverkit
+              run: composer run test:php
+
+    skills-readme:
+        name: README skills table
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  coverage: none
+
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@v4
+              with:
+                  composer-options: '--prefer-dist --no-interaction --no-scripts'
+
+            - name: Regenerate skills table and verify README
+              run: |
+                  composer run docs:skills
+                  git diff --exit-code README.md
