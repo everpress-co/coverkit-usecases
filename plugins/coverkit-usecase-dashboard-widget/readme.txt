@@ -18,4 +18,4 @@ Requires the main CoverKit plugin.
 == Changelog ==
 
 = 0.1.0 =
-* Initial release — install_single use case with wp-admin dashboard widget background.
+* Initial release — site-wide singleton use case with wp-admin dashboard widget background.

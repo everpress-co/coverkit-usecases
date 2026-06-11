@@ -39,15 +39,6 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 	private static bool $resolution_seeded = false;
 
 	/**
-	 * Assignment cardinality for this use case.
-	 *
-	 * @return string
-	 */
-	public static function intrinsic_cardinality(): string {
-		return 'install_single';
-	}
-
-	/**
 	 * Dashboard branding is not scoped to post types.
 	 *
 	 * @return bool
@@ -63,12 +54,9 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 	 */
 	protected static function recommended_settings(): array {
 		return array(
-			'dimensions' => array(
-				'width'  => 1200,
-				'height' => 400,
-			),
-			'crop'       => true,
-			'formats'    => array( 'jpg', 'webp' ),
+
+			'crop'    => true,
+			'formats' => array( 'jpg', 'webp' ),
 		);
 	}
 
@@ -296,12 +284,8 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 		}
 
 		foreach ( $template_ids as $template_id ) {
-			$template_id = (int) $template_id;
-			if ( $template_id <= 0 ) {
-				continue;
-			}
-
-			if ( Use_Case_Storage::is_assignment_active( $template_id, static::get_slug() ) ) {
+			$assignments = get_post_meta( $template_id, '_coverkit_assignments', true );
+			if ( ! empty( $assignments ) && is_array( $assignments ) && in_array( 'dashboard_widget', $assignments, true ) ) {
 				return $template_id;
 			}
 		}

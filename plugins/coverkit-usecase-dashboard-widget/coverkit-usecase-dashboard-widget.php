@@ -37,7 +37,7 @@ function coverkit_usecase_dashboard_widget_register(): void {
 		array(
 			'class'       => \CoverKitUseCaseDashboardWidget\Dashboard_Widget_Use_Case::class,
 			'label'       => __( 'Dashboard widget', 'coverkit-usecase-dashboard-widget' ),
-			'cardinality' => 'install_single',
+			'single'      => true,
 		)
 	);
 }
