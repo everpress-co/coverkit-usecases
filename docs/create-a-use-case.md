@@ -57,7 +57,7 @@ Every bootstrap under `plugins/coverkit-usecase-*/` must include a full WordPres
 
 Use `plugins/coverkit-usecase-starter/coverkit-usecase-starter.php` as the template.
 
-Set `Version:` and `Stable tag:` to the current value in root [`package.json`](../package.json). At release time, `/do-release` bumps the monorepo version and `composer run sync:version` updates every plugin automatically.
+Set `Version:` and `Stable tag:` to the current value in root [`package.json`](../package.json). At release time, `/do-usecase-release` bumps the monorepo version and `composer run sync:version` updates every plugin automatically.
 
 ### Optional compiled assets
 

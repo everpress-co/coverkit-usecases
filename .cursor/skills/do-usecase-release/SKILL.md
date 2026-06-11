@@ -1,11 +1,11 @@
 ---
-name: do-release
-description: Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-release or asks to ship a new use cases release.
+name: do-usecase-release
+description: Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-usecase-release or asks to ship a new use cases release.
 ---
 
 # CoverKit Use Cases release
 
-Follow [`.cursor/commands/do-release.md`](../../commands/do-release.md) exactly.
+Follow [`.cursor/commands/do-usecase-release.md`](../../commands/do-usecase-release.md) exactly.
 
 ## Quick reference
 

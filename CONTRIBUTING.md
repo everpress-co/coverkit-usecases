@@ -51,7 +51,7 @@ composer run package:release:verify
 
 At release time, use `composer run sync:version -- --changed-since vX.Y.Z` so only plugins with changes since the previous tag are bumped. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
 
-**Cut a release:** use **`/do-release`** in Cursor (see [`.cursor/commands/do-release.md`](.cursor/commands/do-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
+**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
 
 Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **two zips per folder** in `plugins/coverkit-usecase-*`: a versioned archive (`<slug>-<version>.zip`) and a stable alias (`<slug>.zip`) for README download links via `releases/latest/download/<slug>.zip`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 

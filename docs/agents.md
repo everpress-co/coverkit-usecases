@@ -19,7 +19,7 @@ The agent reads [root `SKILL.md`](../SKILL.md), asks discovery questions, confir
 | Invocation | Skill |
 | --- | --- |
 | `/new-usecase <slug>` | [`.cursor/skills/new-usecase/SKILL.md`](../.cursor/skills/new-usecase/SKILL.md) |
-| `/do-release` | [`.cursor/skills/do-release/SKILL.md`](../.cursor/skills/do-release/SKILL.md) |
+| `/do-usecase-release` | [`.cursor/skills/do-usecase-release/SKILL.md`](../.cursor/skills/do-usecase-release/SKILL.md) |
 | Read skill directly | `.cursor/skills/understand-use-cases/SKILL.md`, `.cursor/skills/lint-usecase/SKILL.md` |
 
 Thin rule [`.cursor/rules/new-usecase.mdc`](../.cursor/rules/new-usecase.mdc) defers to the **new-usecase** skill for files under `plugins/`.
@@ -50,4 +50,4 @@ CI fails if skills are added without updating AGENTS.md.
 2. **Monorepo use case** — `new-usecase` skill → lint → add README table row → `docs:skills`
 3. **Onboarding** — `understand-use-cases` skill + `docs/architecture.md`
 4. **Before PR** — `lint-usecase` skill (`lint:php`, tests, README checks)
-5. **Release** — `/do-release` on `develop` → tag `vX.Y.Z` → GitHub Actions publishes per-use-case zips
+5. **Release** — `/do-usecase-release` on `develop` → tag `vX.Y.Z` → GitHub Actions publishes per-use-case zips

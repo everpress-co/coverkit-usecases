@@ -210,8 +210,8 @@ After push, verify:
 
 ## Example invocation
 
-User: **`/do-release`**
+User: **`/do-usecase-release`**
 
 Agent: pre-flight on `develop` → resolve version → `release/<version>` → bump monorepo + sync loader/changed plugins (`--changed-since`) + CHANGELOG → verify → summary → user “proceed” → commit + tag `v<version>` → optional push ask.
 
-User: **`/do-release minor`** — force minor bump.
+User: **`/do-usecase-release minor`** — force minor bump.

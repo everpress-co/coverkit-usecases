@@ -28,7 +28,7 @@ See [root `SKILL.md`](SKILL.md) and [`docs/create-a-use-case.md`](docs/create-a-
 <!-- skills-table:start -->
 | Skill | Description |
 | --- | --- |
-| [`do-release`](.cursor/skills/do-release/SKILL.md) | Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-release or asks to ship a new use cases release. |
+| [`do-usecase-release`](.cursor/skills/do-usecase-release/SKILL.md) | Cut a use cases release — bump package.json, sync loader and only changed use case plugin versions (git diff since previous tag), verify install-ready zips, tag vX.Y.Z, and trigger GitHub Actions. Use when the user invokes /do-usecase-release or asks to ship a new use cases release. |
 | [`lint-usecase`](.cursor/skills/lint-usecase/SKILL.md) | Run composer lint:php, fix PHPCS issues, verify README use-case table row exists, and regenerate the skills table for use case plugins in this repository. |
 | [`new-usecase`](.cursor/skills/new-usecase/SKILL.md) | Scaffold plugins/coverkit-usecase-<slug>/ with a full WordPress plugin header, coverkit_init registration, and optional Use_Case subclass. Use when the user invokes /new-usecase or asks to add a custom CoverKit use case in this repo. |
 | [`understand-use-cases`](.cursor/skills/understand-use-cases/SKILL.md) | CoverKit custom use case architecture: coverkit_register_use_case API, label-only vs subclass, built-in slugs to avoid, and docs.coverkit.com references. Use when onboarding or reviewing how use case plugins work. |
