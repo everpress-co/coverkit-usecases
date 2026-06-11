@@ -44,6 +44,7 @@ jobs:
                   repository: everpress-co/coverkit
                   ref: develop
                   path: coverkit
+                  token: ${{ secrets.COVERKIT_CHECKOUT_TOKEN }}
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
