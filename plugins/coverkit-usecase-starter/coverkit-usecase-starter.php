@@ -17,6 +17,7 @@ add_action(
 		\CoverKit\coverkit_register_use_case(
 			'starter',
 			array(
+				// `class` is optional — omit it for base Use_Case behavior; this plugin keeps a subclass to demo custom settings.
 				'class' => \CoverKitUseCaseStarter\Starter_Use_Case::class,
 				'label' => __( 'Starter (test)', 'coverkit-usecase-starter' ),
 			)

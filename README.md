@@ -31,9 +31,9 @@ coverkit-usecases/
 
 ## Adding a new use case
 
-1. Copy `plugins/coverkit-usecase-starter` to `plugins/coverkit-usecase-<slug>`.
+1. Copy `plugins/coverkit-usecase-starter` to `plugins/coverkit-usecase-<slug>` (or scaffold a minimal bootstrap-only plugin).
 2. Rename the bootstrap PHP file and replace starter-specific names.
-3. Subclass `CoverKit\Use_Case` and register on `coverkit_init`:
+3. Register on `coverkit_init` with **slug** and **label**. Add a `class` key only when you subclass `CoverKit\Use_Case` for custom dimensions, settings, mappings, or front-end hooks:
 
    ```php
    add_action(
@@ -42,7 +42,6 @@ coverkit-usecases/
            coverkit_register_use_case(
                'my_slug',
                array(
-                   'class' => My_Use_Case::class,
                    'label' => __( 'My use case', 'coverkit-usecase-my-slug' ),
                )
            );
