@@ -49,15 +49,15 @@ class VersionSyncTest extends CoverKitUseCases_TestCase {
 	/**
 	 * @dataProvider bootstrap_provider
 	 */
-	public function test_bootstrap_version_matches_package_json( string $bootstrap_file ): void {
-		$version  = $this->expected_version();
+	public function test_bootstrap_version_is_valid_semver( string $bootstrap_file ): void {
 		$contents = (string) file_get_contents( $bootstrap_file );
 		$headers  = $this->parse_plugin_headers( $contents );
 		$slug     = basename( dirname( $bootstrap_file ) );
 		$prefix   = $this->slug_to_constant_prefix( $slug );
 		$constant = $prefix . '_VERSION';
+		$version  = $headers['Version'] ?? '';
 
-		$this->assertSame( $version, $headers['Version'] ?? '' );
+		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+/', $version );
 		$this->assertMatchesRegularExpression(
 			"/define\(\s*'{$constant}',\s*'{$version}'\s*\);/",
 			$contents
@@ -67,16 +67,18 @@ class VersionSyncTest extends CoverKitUseCases_TestCase {
 	/**
 	 * @dataProvider bootstrap_provider
 	 */
-	public function test_readme_stable_tag_matches_package_json( string $bootstrap_file ): void {
-		$version     = $this->expected_version();
+	public function test_readme_stable_tag_matches_bootstrap_version( string $bootstrap_file ): void {
+		$contents = (string) file_get_contents( $bootstrap_file );
+		$headers  = $this->parse_plugin_headers( $contents );
+		$version  = $headers['Version'] ?? '';
 		$readme_file = dirname( $bootstrap_file ) . '/readme.txt';
 
 		if ( ! is_readable( $readme_file ) ) {
 			$this->markTestSkipped( 'readme.txt not present for ' . basename( dirname( $bootstrap_file ) ) );
 		}
 
-		$contents = (string) file_get_contents( $readme_file );
-		$this->assertMatchesRegularExpression( '/^Stable tag:\s*' . preg_quote( $version, '/' ) . '\s*$/m', $contents );
+		$readme_contents = (string) file_get_contents( $readme_file );
+		$this->assertMatchesRegularExpression( '/^Stable tag:\s*' . preg_quote( $version, '/' ) . '\s*$/m', $readme_contents );
 	}
 
 	/**

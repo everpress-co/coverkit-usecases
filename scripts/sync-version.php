@@ -9,7 +9,29 @@ declare(strict_types=1);
 
 $repo_root = dirname( __DIR__ );
 
-$check_only = in_array( '--check', $argv, true );
+$check_only      = in_array( '--check', $argv, true );
+$changed_since   = null;
+$sync_all_plugins = true;
+
+for ( $index = 1; $index < $argc; $index++ ) {
+	$arg = $argv[ $index ];
+
+	if ( '--changed-since' === $arg ) {
+		$changed_since = $argv[ $index + 1 ] ?? '';
+		if ( '' === $changed_since ) {
+			fwrite( STDERR, "--changed-since requires a git ref (e.g. v0.1.0)\n" );
+			exit( 1 );
+		}
+		$sync_all_plugins = false;
+		++$index;
+		continue;
+	}
+
+	if ( '--all-plugins' === $arg ) {
+		$sync_all_plugins = true;
+		$changed_since    = null;
+	}
+}
 
 $package_json = $repo_root . '/package.json';
 
@@ -48,7 +70,12 @@ $plugin_dirs = glob( $plugins_dir . '/coverkit-usecase-*', GLOB_ONLYDIR ) ?: arr
 sort( $plugin_dirs, SORT_STRING );
 
 foreach ( $plugin_dirs as $plugin_dir ) {
-	$slug            = basename( $plugin_dir );
+	$slug = basename( $plugin_dir );
+
+	if ( ! $sync_all_plugins && null !== $changed_since && ! plugin_has_changes_since( $repo_root, $changed_since, $slug ) ) {
+		continue;
+	}
+
 	$bootstrap_file  = $plugin_dir . '/' . $slug . '.php';
 	$readme_file     = $plugin_dir . '/readme.txt';
 	$constant_prefix = slug_to_constant_prefix( $slug );
@@ -68,20 +95,57 @@ foreach ( $plugin_dirs as $plugin_dir ) {
 	}
 }
 
-if ( array() === $changes ) {
-	if ( $check_only ) {
-		fwrite( STDOUT, "Version {$version} is already synced.\n" );
-	}
-	exit( 0 );
-}
-
 if ( $check_only ) {
+	$errors = array();
+
+	if ( isset( $changes[ $loader_file ] ) ) {
+		$errors[] = "Loader version does not match package.json ({$loader_file})";
+	}
+
+	foreach ( $plugin_dirs as $plugin_dir ) {
+		$slug = basename( $plugin_dir );
+		$consistency_error = validate_plugin_version_consistency( $plugin_dir, $slug );
+		if ( null !== $consistency_error ) {
+			$errors[] = $consistency_error;
+		}
+
+		$should_match_package = false;
+		if ( in_array( '--all-plugins', $argv, true ) ) {
+			$should_match_package = true;
+		} elseif ( null !== $changed_since ) {
+			$should_match_package = plugin_has_changes_since( $repo_root, $changed_since, $slug );
+		}
+
+		if ( ! $should_match_package ) {
+			continue;
+		}
+
+		$bootstrap_file = $plugin_dir . '/' . $slug . '.php';
+		if ( isset( $changes[ $bootstrap_file ] ) ) {
+			$errors[] = "Plugin {$slug} version should be {$version} (bootstrap)";
+		}
+
+		$readme_file = $plugin_dir . '/readme.txt';
+		if ( isset( $changes[ $readme_file ] ) ) {
+			$errors[] = "Plugin {$slug} Stable tag should be {$version} (readme.txt)";
+		}
+	}
+
+	if ( array() === $errors ) {
+		fwrite( STDOUT, "Version checks passed for {$version}.\n" );
+		exit( 0 );
+	}
+
 	fwrite( STDERR, "Version drift detected for release {$version}:\n" );
-	foreach ( array_keys( $changes ) as $file ) {
-		fwrite( STDERR, "  - {$file}\n" );
+	foreach ( $errors as $error ) {
+		fwrite( STDERR, "  - {$error}\n" );
 	}
 	fwrite( STDERR, "Run: composer run sync:version\n" );
 	exit( 1 );
+}
+
+if ( array() === $changes ) {
+	exit( 0 );
 }
 
 foreach ( $changes as $file => $contents ) {
@@ -94,6 +158,93 @@ foreach ( $changes as $file => $contents ) {
 
 fwrite( STDOUT, "Synced version {$version}.\n" );
 exit( 0 );
+
+/**
+ * Whether a plugin directory has changes since a git ref.
+ *
+ * @param string $repo_root Repository root.
+ * @param string $ref       Git ref (tag or commit).
+ * @param string $slug      Plugin folder slug.
+ * @return bool
+ */
+function plugin_has_changes_since( string $repo_root, string $ref, string $slug ): bool {
+	$relative = 'plugins/' . $slug;
+	$command  = sprintf(
+		'cd %s && git diff --quiet %s..HEAD -- %s',
+		escapeshellarg( $repo_root ),
+		escapeshellarg( $ref ),
+		escapeshellarg( $relative )
+	);
+	$output   = array();
+	$exit     = 0;
+	exec( $command, $output, $exit );
+
+	// git diff --quiet: 0 = no diff, 1 = diff, other = error.
+	if ( 0 === $exit ) {
+		return false;
+	}
+
+	if ( 1 === $exit ) {
+		return true;
+	}
+
+	fwrite( STDERR, "git diff failed for {$relative} (ref {$ref}, exit {$exit})\n" );
+	exit( 1 );
+}
+
+/**
+ * Validate bootstrap Version, VERSION constant, and readme Stable tag agree.
+ *
+ * @param string $plugin_dir Plugin directory.
+ * @param string $slug       Plugin folder slug.
+ * @return string|null Error message or null when valid.
+ */
+function validate_plugin_version_consistency( string $plugin_dir, string $slug ): ?string {
+	$bootstrap_file  = $plugin_dir . '/' . $slug . '.php';
+	$readme_file     = $plugin_dir . '/readme.txt';
+	$constant_prefix = slug_to_constant_prefix( $slug );
+
+	if ( ! is_readable( $bootstrap_file ) ) {
+		return "Missing bootstrap: {$bootstrap_file}";
+	}
+
+	$contents = (string) file_get_contents( $bootstrap_file );
+
+	if ( ! preg_match( '/^\s*\*\s*Version:\s*(.+)$/m', $contents, $header_match ) ) {
+		return "Missing Version header in {$bootstrap_file}";
+	}
+
+	$header_version = trim( $header_match[1] );
+
+	if ( ! preg_match( '/^\d+\.\d+\.\d+/', $header_version ) ) {
+		return "Invalid Version in {$bootstrap_file}: {$header_version}";
+	}
+
+	if ( ! preg_match(
+		"/^define\(\s*'{$constant_prefix}_VERSION',\s*'{$header_version}'\s*\);/m",
+		$contents
+	) ) {
+		return "VERSION constant does not match header in {$bootstrap_file}";
+	}
+
+	if ( ! is_readable( $readme_file ) ) {
+		return null;
+	}
+
+	$readme = (string) file_get_contents( $readme_file );
+
+	if ( ! preg_match( '/^Stable tag:\s*(.+)$/m', $readme, $readme_match ) ) {
+		return "Missing Stable tag in {$readme_file}";
+	}
+
+	$stable_tag = trim( $readme_match[1] );
+
+	if ( $stable_tag !== $header_version ) {
+		return "Stable tag ({$stable_tag}) does not match bootstrap Version ({$header_version}) in {$slug}";
+	}
+
+	return null;
+}
 
 /**
  * Convert plugin slug to VERSION constant prefix.

@@ -14,7 +14,7 @@ Run a **two-phase** release workflow. **Stop on any failure** — do not commit,
 develop
   → pre-flight + resolve version
   → create release/<version> branch
-  → bump package.json, sync PHP/readme versions, update CHANGELOG
+  → bump package.json, sync loader + changed plugins only, update CHANGELOG
   → package:release:verify + tests
   → checkpoint: summary + ask
   → (if yes) commit + tag v<version> on release/<version>
@@ -70,17 +70,55 @@ All file edits, tests, commits, and tags happen **on this branch**, not on `deve
 
 ## Update versioned files
 
+**Monorepo version** (always bump):
+
 ```bash
 npm version <release> --no-git-tag-version
-composer run sync:version
 ```
 
 | Target | Source |
 | --- | --- |
 | [`package.json`](package.json) + [`package-lock.json`](package-lock.json) | `npm version` |
-| [`coverkit-usecases.php`](coverkit-usecases.php) | `sync:version` — `Version:` + `COVERKIT_USECASES_VERSION` |
-| Each `plugins/coverkit-usecase-*/{slug}.php` | `sync:version` — `Version:` + `COVERKIT_USECASE_*_VERSION` |
-| Each `plugins/coverkit-usecase-*/readme.txt` | `sync:version` — `Stable tag:` |
+| [`coverkit-usecases.php`](coverkit-usecases.php) | `sync:version` — `Version:` + `COVERKIT_USECASES_VERSION` (always) |
+
+**Per-use-case plugin versions** — bump **only when that plugin changed** since the previous release. Unchanged plugins keep their existing `Version:` / `Stable tag:`.
+
+1. Resolve previous tag after `git fetch --tags`:
+
+   ```bash
+   PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+   ```
+
+   - If `PREV_TAG` is empty (first release), sync all plugins.
+   - Otherwise use `PREV_TAG` as the diff base (e.g. `v0.1.1`).
+
+2. List changed plugins (for the release summary):
+
+   ```bash
+   for dir in plugins/coverkit-usecase-*/; do
+     slug=$(basename "$dir")
+     git diff --quiet "${PREV_TAG}"..HEAD -- "plugins/${slug}/" || echo "changed: ${slug}"
+   done
+   ```
+
+3. Sync loader + changed plugins only:
+
+   ```bash
+   if [[ -z "$PREV_TAG" ]]; then
+     composer run sync:version -- --all-plugins
+   else
+     composer run sync:version -- --changed-since "$PREV_TAG"
+   fi
+   ```
+
+| Target | When synced |
+| --- | --- |
+| Each `plugins/coverkit-usecase-*/{slug}.php` | Only if `git diff <prev-tag>..HEAD -- plugins/<slug>/` is non-empty |
+| Each `plugins/coverkit-usecase-*/readme.txt` | Same rule as bootstrap (`Stable tag:`) |
+
+`--changed-since` uses `git diff` on the plugin folder only (not monorepo root files). New plugins under `plugins/` count as changed. Do **not** run plain `composer run sync:version` during release — that bumps every plugin.
+
+Release zips use each plugin’s own `Version:` header for the filename (`<slug>-<plugin-version>.zip`), so unchanged plugins keep their prior zip name on the GitHub Release.
 
 ---
 
@@ -103,7 +141,7 @@ Run from repo root in order:
 | PHP lint | `composer run lint:php` |
 | PHP tests | `COVERKIT_PLUGIN_DIR=../coverkit composer run test:php` |
 
-`package:release:verify` builds `dist/<slug>-<version>.zip` locally and asserts each zip contains `<slug>/<slug>.php`. Do **not** commit `dist/` or `build/release/` (gitignored; CI rebuilds on tag push).
+`package:release:verify` builds `dist/<slug>-<plugin-version>.zip` locally (version from each bootstrap `Version:` header) and asserts each zip contains `<slug>/<slug>.php`. Do **not** commit `dist/` or `build/release/` (gitignored; CI rebuilds on tag push).
 
 **Scope warning:** Before commit, run `git status`. If files outside version/CHANGELOG paths changed, **warn** and only stage intended release files unless the user says otherwise.
 
@@ -114,9 +152,9 @@ Run from repo root in order:
 Present a compact summary:
 
 - Branch: `release/<version>`
-- Release version and synced files
+- Release version, loader sync, and which plugins were version-bumped vs left unchanged (from `git diff`)
 - CHANGELOG section renamed + new `## [Unreleased]`
-- Expected GitHub Release assets: `dist/coverkit-usecase-*-<version>.zip` (one per folder in `plugins/`)
+- Expected GitHub Release assets: `dist/coverkit-usecase-*-<plugin-version>.zip` (one per folder in `plugins/`; version per plugin header)
 - Test / lint / packaging results (pass/fail)
 - Files to be committed (list paths)
 - Planned tag: `v<version>`
@@ -174,6 +212,6 @@ After push, verify:
 
 User: **`/do-release`**
 
-Agent: pre-flight on `develop` → resolve version → `release/<version>` → bump + sync + CHANGELOG → verify → summary → user “proceed” → commit + tag `v<version>` → optional push ask.
+Agent: pre-flight on `develop` → resolve version → `release/<version>` → bump monorepo + sync loader/changed plugins (`--changed-since`) + CHANGELOG → verify → summary → user “proceed” → commit + tag `v<version>` → optional push ask.
 
 User: **`/do-release minor`** — force minor bump.
