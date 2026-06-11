@@ -1,8 +1,35 @@
 # CoverKit Use Cases
 
+[![Unit tests](https://github.com/everpress/coverkit-usecases/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/everpress/coverkit-usecases/actions/workflows/unit-tests.yml)
+
 Monorepo for **custom CoverKit use cases**. Each use case lives in its own plugin under `plugins/`, loaded automatically by the root WordPress plugin.
 
 Requires the main [CoverKit](https://coverkit.com) plugin to be installed and active.
+
+## Quick start
+
+### Monorepo (all use cases)
+
+1. Clone into `wp-content/plugins/coverkit-usecases/`.
+2. Run `composer install`.
+3. Activate **CoverKit** and **CoverKit Use Cases** in **Plugins** — all use cases under `plugins/` load automatically.
+4. Open a CoverKit template → **Use cases** sidebar to enable a custom use case.
+
+### Single use case (release zip)
+
+1. Download a zip from [Releases](https://github.com/everpress/coverkit-usecases/releases) (e.g. `coverkit-usecase-starter-0.1.0.zip`).
+2. Extract to `wp-content/plugins/coverkit-usecase-<slug>/`.
+3. Activate the use case plugin (requires **CoverKit**).
+
+Each release zip is a valid standalone WordPress plugin with `Requires Plugins: coverkit`.
+
+## Create your first use case
+
+See [`docs/create-a-use-case.md`](docs/create-a-use-case.md) for the step-by-step guide.
+
+Or use the Cursor command **`/new-usecase <slug>`** — it scaffolds from the starter template (see [Agent skills](#agent-skills) below).
+
+CoverKit reference: [Custom use cases](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
 
 ## Structure
 
@@ -11,50 +38,23 @@ coverkit-usecases/
 ├── coverkit-usecases.php           # WordPress plugin — loads all use cases
 ├── plugins/
 │   └── coverkit-usecase-starter/   # example / test use case
-├── composer.json                   # PHP dev tools (PHPCS)
-└── package.json                    # npm scripts (lint wrappers)
+├── docs/                           # developer documentation
+├── tests/php/                      # PHPUnit
+├── composer.json                   # PHP dev tools (PHPCS, PHPUnit)
+└── package.json                    # version + npm script wrappers
 ```
 
-## Local development
+## Agent skills
 
-1. Install PHP dev dependencies:
+<!-- skills-table:start -->
+| Skill | Description |
+| --- | --- |
+| [`lint-usecase`](.cursor/skills/lint-usecase/SKILL.md) | Run composer lint:php, fix PHPCS issues, verify README use-case table row exists, and regenerate the skills table for coverkit-usecases plugins. |
+| [`new-usecase`](.cursor/skills/new-usecase/SKILL.md) | Scaffold plugins/coverkit-usecase-<slug>/ with a full WordPress plugin header, coverkit_init registration, and optional Use_Case subclass. Use when the user invokes /new-usecase or asks to add a custom CoverKit use case in this repo. |
+| [`understand-use-cases`](.cursor/skills/understand-use-cases/SKILL.md) | Onboarding for the coverkit-usecases monorepo: loader vs standalone install, coverkit_register_use_case API, label-only vs subclass, built-in slugs to avoid, and links to CoverKit reference classes. |
+<!-- skills-table:end -->
 
-   ```bash
-   composer install
-   ```
-
-2. Ensure this folder is in `wp-content/plugins/coverkit-usecases/` (clone or symlink the repo there).
-
-3. Activate **CoverKit** and **CoverKit Use Cases** in **Plugins** — all use cases under `plugins/` load automatically.
-
-4. Open a CoverKit template in the editor — custom use cases appear in the **Use cases** sidebar.
-
-## Adding a new use case
-
-1. Copy `plugins/coverkit-usecase-starter` to `plugins/coverkit-usecase-<slug>` (or scaffold a minimal bootstrap-only plugin).
-2. Rename the bootstrap PHP file and replace starter-specific names.
-3. Register on `coverkit_init` with **slug** and **label**. Add a `class` key only when you subclass `CoverKit\Use_Case` for custom dimensions, settings, mappings, or front-end hooks:
-
-   ```php
-   add_action(
-       'coverkit_init',
-       function () {
-           coverkit_register_use_case(
-               'my_slug',
-               array(
-                   'label' => __( 'My use case', 'coverkit-usecase-my-slug' ),
-               )
-           );
-       },
-       5
-   );
-   ```
-
-4. Add a row to the **Plugins** table below. No symlink or re-activation needed — the root plugin picks up new folders on the next request.
-
-Or use the Cursor command **`/new-usecase <slug>`** — it scaffolds the plugin from the starter template (see `.cursor/rules/new-usecase.mdc`).
-
-See CoverKit docs: [Custom use cases](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
+See also [`docs/agents.md`](docs/agents.md), [`AGENTS.md`](AGENTS.md).
 
 ## Scripts
 
@@ -62,10 +62,25 @@ See CoverKit docs: [Custom use cases](https://github.com/everpress/coverkit/blob
 | --- | --- |
 | `composer run lint:php` | Run PHPCS on plugin PHP files |
 | `composer run lint:php:fix` | Auto-fix PHPCS issues |
+| `COVERKIT_PLUGIN_DIR=../coverkit composer run test:php` | PHPUnit (requires sibling CoverKit checkout) |
+| `composer run docs:skills` | Regenerate Agent skills table in this README |
 | `npm run lint:php` | Same as `composer run lint:php` |
+
+CI checks out [CoverKit `develop`](https://github.com/everpress/coverkit/tree/develop) for PHPUnit.
+
+## Releases
+
+- **Monorepo:** clone this repository; activate **CoverKit Use Cases**.
+- **Per use case:** download zips from [Releases](https://github.com/everpress/coverkit-usecases/releases) — one zip per folder in `plugins/coverkit-usecase-*`.
+
+Version is synced across `package.json`, `coverkit-usecases.php`, and release tags (`v*`).
 
 ## Use cases
 
 | Folder | Use case slug | Purpose |
 | --- | --- | --- |
 | [coverkit-usecase-starter](plugins/coverkit-usecase-starter/) | `starter` | Minimal editor-only test use case |
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CHANGELOG.md`](CHANGELOG.md).

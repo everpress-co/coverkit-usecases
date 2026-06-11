@@ -1,0 +1,83 @@
+---
+name: Create Release
+
+on:
+    workflow_dispatch:
+    push:
+        tags:
+            - 'v*'
+
+permissions:
+    contents: write
+
+jobs:
+    unit-tests:
+        uses: ./.github/workflows/unit-tests-reusable.yml
+
+    create-release:
+        name: Create per-use-case release zips
+        needs: unit-tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Resolve version
+              id: version
+              run: |
+                  if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+                    VERSION="${GITHUB_REF#refs/tags/v}"
+                  else
+                    VERSION=$(jq -r '.version' < package.json)
+                  fi
+
+                  if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+                    echo "Could not resolve release version" >&2
+                    exit 1
+                  fi
+
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Build per-use-case zips
+              run: |
+                  VERSION="${{ steps.version.outputs.version }}"
+                  mkdir -p dist
+
+                  for plugin_dir in plugins/coverkit-usecase-*; do
+                    slug=$(basename "$plugin_dir")
+                    zip_name="${slug}-${VERSION}.zip"
+                    (
+                      cd "$plugin_dir"
+                      zip -r "../../dist/${zip_name}" . \
+                        -x '*.DS_Store' \
+                        -x '*/.git/*'
+                    )
+                    echo "Created dist/${zip_name}"
+                  done
+
+            - name: Extract changelog section
+              id: changelog
+              run: |
+                  VERSION="${{ steps.version.outputs.version }}"
+                  awk -v ver="$VERSION" '
+                    $0 ~ "^## \\[" ver "\\]" { found=1; next }
+                    found && /^## \[/ { exit }
+                    found { print }
+                  ' CHANGELOG.md > release-notes.md
+
+                  if [[ ! -s release-notes.md ]]; then
+                    echo "Release notes for version ${VERSION} not found in CHANGELOG.md" >&2
+                    exit 1
+                  fi
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ github.ref_name }}
+                  name: v${{ steps.version.outputs.version }}
+                  body_path: release-notes.md
+                  files: dist/*.zip
+                  fail_on_unmatched_files: true

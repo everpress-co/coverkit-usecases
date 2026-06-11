@@ -7,7 +7,9 @@
 		"php": "^8.0"
 	},
 	"require-dev": {
+		"brain/monkey": "^2.6",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpunit/phpunit": "^10.5",
 		"squizlabs/php_codesniffer": "^3.7",
 		"wp-coding-standards/wpcs": "^3.0"
 	},
@@ -17,6 +19,11 @@
 			"email": "xaver@everpress.co"
 		}
 	],
+	"autoload-dev": {
+		"psr-4": {
+			"CoverKitUseCases\\Tests\\": "tests/php/"
+		}
+	},
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
@@ -24,7 +31,9 @@
 		"sort-packages": true
 	},
 	"scripts": {
+		"docs:skills": "@php scripts/generate-skills-table.php",
 		"lint:php": "phpcs",
-		"lint:php:fix": "phpcbf"
+		"lint:php:fix": "phpcbf",
+		"test:php": "phpunit --configuration phpunit.xml.dist"
 	}
 }
