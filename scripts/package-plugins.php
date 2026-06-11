@@ -11,8 +11,6 @@ $repo_root = dirname( __DIR__ );
 
 $verify_only = in_array( '--verify', $argv, true );
 
-$version = read_package_version( $repo_root . '/package.json' );
-
 $dist_dir    = $repo_root . '/dist';
 $staging_dir = $repo_root . '/build/release';
 
@@ -38,8 +36,10 @@ if ( array() === $plugin_dirs ) {
 $zip_paths = array();
 
 foreach ( $plugin_dirs as $plugin_dir ) {
-	$slug     = basename( $plugin_dir );
-	$zip_path = package_plugin( $repo_root, $plugin_dir, $slug, $version, $staging_dir, $dist_dir );
+	$slug            = basename( $plugin_dir );
+	$bootstrap_file  = $plugin_dir . '/' . $slug . '.php';
+	$plugin_version  = read_plugin_version( $bootstrap_file );
+	$zip_path        = package_plugin( $repo_root, $plugin_dir, $slug, $plugin_version, $staging_dir, $dist_dir );
 	$zip_paths[ $slug ] = $zip_path;
 	fwrite( STDOUT, "Created {$zip_path}\n" );
 }
@@ -54,28 +54,28 @@ if ( $verify_only ) {
 exit( 0 );
 
 /**
- * Read semver from package.json.
+ * Read semver from a use case bootstrap Version header.
  *
- * @param string $package_json Path to package.json.
+ * @param string $bootstrap_file Path to {slug}.php.
  * @return string
  */
-function read_package_version( string $package_json ): string {
-	if ( ! is_readable( $package_json ) ) {
-		fwrite( STDERR, "package.json not found: {$package_json}\n" );
+function read_plugin_version( string $bootstrap_file ): string {
+	if ( ! is_readable( $bootstrap_file ) ) {
+		fwrite( STDERR, "Bootstrap not found: {$bootstrap_file}\n" );
 		exit( 1 );
 	}
 
-	$decoded = json_decode( (string) file_get_contents( $package_json ), true );
+	$contents = (string) file_get_contents( $bootstrap_file );
 
-	if ( ! is_array( $decoded ) || empty( $decoded['version'] ) || ! is_string( $decoded['version'] ) ) {
-		fwrite( STDERR, "Could not read version from package.json\n" );
+	if ( ! preg_match( '/^\s*\*\s*Version:\s*(.+)$/m', $contents, $matches ) ) {
+		fwrite( STDERR, "Could not read Version header in {$bootstrap_file}\n" );
 		exit( 1 );
 	}
 
-	$version = $decoded['version'];
+	$version = trim( $matches[1] );
 
 	if ( ! preg_match( '/^\d+\.\d+\.\d+/', $version ) ) {
-		fwrite( STDERR, "Invalid semver in package.json: {$version}\n" );
+		fwrite( STDERR, "Invalid semver in {$bootstrap_file}: {$version}\n" );
 		exit( 1 );
 	}
 

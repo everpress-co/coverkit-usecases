@@ -34,18 +34,17 @@ class PackageStructureTest extends CoverKitUseCases_TestCase {
 	 */
 	public function test_release_zip_has_plugin_folder_root(): void {
 		$repo_root = dirname( __DIR__, 2 );
-		$decoded   = json_decode( (string) file_get_contents( $repo_root . '/package.json' ), true );
-		$this->assertIsArray( $decoded );
-
-		$version = $decoded['version'] ?? '';
-		$this->assertIsString( $version );
-		$this->assertNotSame( '', $version );
 
 		$plugin_dirs = glob( $repo_root . '/plugins/coverkit-usecase-*', GLOB_ONLYDIR ) ?: array();
 		$this->assertNotEmpty( $plugin_dirs );
 
 		foreach ( $plugin_dirs as $plugin_dir ) {
-			$slug     = basename( $plugin_dir );
+			$slug            = basename( $plugin_dir );
+			$bootstrap_file  = $plugin_dir . '/' . $slug . '.php';
+			$bootstrap       = (string) file_get_contents( $bootstrap_file );
+			$this->assertMatchesRegularExpression( '/^\s*\*\s*Version:\s*(.+)$/m', $bootstrap, $bootstrap_file );
+			preg_match( '/^\s*\*\s*Version:\s*(.+)$/m', $bootstrap, $matches );
+			$version  = trim( $matches[1] );
 			$zip_path = $repo_root . '/dist/' . $slug . '-' . $version . '.zip';
 
 			$this->assertFileExists( $zip_path, "Missing release zip for {$slug}" );

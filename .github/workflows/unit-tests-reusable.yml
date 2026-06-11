@@ -63,8 +63,8 @@ jobs:
                   COVERKIT_PLUGIN_DIR: ${{ github.workspace }}/coverkit
               run: composer run test:php
 
-    skills-readme:
-        name: README skills table
+    skills-agents:
+        name: AGENTS.md skills table
         runs-on: ubuntu-latest
         timeout-minutes: 10
 
@@ -83,7 +83,7 @@ jobs:
               with:
                   composer-options: '--prefer-dist --no-interaction --no-scripts'
 
-            - name: Regenerate skills table and verify README
+            - name: Regenerate skills table and verify AGENTS.md
               run: |
                   composer run docs:skills
-                  git diff --exit-code README.md
+                  git diff --exit-code AGENTS.md

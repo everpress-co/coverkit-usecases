@@ -45,9 +45,11 @@ composer run package:release:verify
 
 | Target | Fields |
 | --- | --- |
-| `coverkit-usecases.php` | `Version:` header, `COVERKIT_USECASES_VERSION` |
+| `coverkit-usecases.php` | `Version:` header, `COVERKIT_USECASES_VERSION` (always) |
 | Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` |
 | Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` |
+
+At release time, use `composer run sync:version -- --changed-since vX.Y.Z` so only plugins with changes since the previous tag are bumped. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
 
 **Cut a release:** use **`/do-release`** in Cursor (see [`.cursor/commands/do-release.md`](.cursor/commands/do-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `vX.Y.Z`.
 
@@ -60,5 +62,5 @@ User-facing changes belong in `## [Unreleased]` at the top of [`CHANGELOG.md`](C
 ## Pull requests
 
 - Target `develop` unless otherwise noted.
-- Ensure README use cases table and skills table are updated.
+- Ensure README use cases table and AGENTS.md contributor skills table are updated.
 - Do not commit `vendor/` changes unrelated to `composer.lock` updates from your branch.

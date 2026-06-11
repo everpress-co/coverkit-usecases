@@ -1,6 +1,6 @@
 <?php
 /**
- * Regenerate the Agent skills table in README.md from skill SKILL.md frontmatter files.
+ * Regenerate the contributor skills table in AGENTS.md from skill SKILL.md frontmatter files.
  *
  * @package CoverKitUseCases
  */
@@ -9,15 +9,15 @@ declare(strict_types=1);
 
 $repo_root  = dirname( __DIR__ );
 $skills_dir = $repo_root . '/.cursor/skills';
-$readme     = $repo_root . '/README.md';
+$agents_md  = $repo_root . '/AGENTS.md';
 
 if ( ! is_dir( $skills_dir ) ) {
 	fwrite( STDERR, "Skills directory not found: {$skills_dir}\n" );
 	exit( 1 );
 }
 
-if ( ! is_readable( $readme ) ) {
-	fwrite( STDERR, "README.md not found: {$readme}\n" );
+if ( ! is_readable( $agents_md ) ) {
+	fwrite( STDERR, "AGENTS.md not found: {$agents_md}\n" );
 	exit( 1 );
 }
 
@@ -54,26 +54,26 @@ foreach ( $skills as $slug => $skill ) {
 
 $table = implode( "\n", $rows );
 
-$readme_contents = (string) file_get_contents( $readme );
+$agents_contents = (string) file_get_contents( $agents_md );
 $pattern         = '/<!-- skills-table:start -->.*?<!-- skills-table:end -->/s';
 
 $replacement = "<!-- skills-table:start -->\n{$table}\n<!-- skills-table:end -->";
 
-if ( ! preg_match( $pattern, $readme_contents ) ) {
-	fwrite( STDERR, "README.md is missing skills-table markers.\n" );
+if ( ! preg_match( $pattern, $agents_contents ) ) {
+	fwrite( STDERR, "AGENTS.md is missing skills-table markers.\n" );
 	exit( 1 );
 }
 
-$updated = (string) preg_replace( $pattern, $replacement, $readme_contents, 1 );
+$updated = (string) preg_replace( $pattern, $replacement, $agents_contents, 1 );
 
-if ( $updated === $readme_contents ) {
-	echo "README skills table is already up to date.\n";
+if ( $updated === $agents_contents ) {
+	echo "AGENTS.md skills table is already up to date.\n";
 	exit( 0 );
 }
 
 // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- CLI script.
-file_put_contents( $readme, $updated );
-echo "Updated README.md skills table (" . count( $skills ) . " skills).\n";
+file_put_contents( $agents_md, $updated );
+echo "Updated AGENTS.md skills table (" . count( $skills ) . " skills).\n";
 
 /**
  * @param string $contents SKILL.md file contents.

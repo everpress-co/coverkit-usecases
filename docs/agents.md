@@ -34,15 +34,15 @@ Thin rule [`.cursor/rules/new-usecase.mdc`](../.cursor/rules/new-usecase.mdc) de
 
 Tell the agent to read the relevant `SKILL.md` under `.cursor/skills/` — content is editor-agnostic.
 
-## README skills table
+## Contributor skills table
 
-The **Agent skills** section in [`README.md`](../README.md) is generated from skill frontmatter:
+The **Contributor skills** section in [`AGENTS.md`](../AGENTS.md) is generated from skill frontmatter:
 
 ```bash
 composer run docs:skills
 ```
 
-CI fails if skills are added without updating README.
+CI fails if skills are added without updating AGENTS.md.
 
 ## Typical workflows
 

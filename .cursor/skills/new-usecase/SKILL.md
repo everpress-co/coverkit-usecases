@@ -148,7 +148,7 @@ When a use case ships compiled JS/CSS, add `package.json` with `@wordpress/scrip
 ## Phase 3 — Wire up (this repository only)
 
 1. Add a row to the **Use cases** table in root [`README.md`](../../../README.md).
-2. Run `composer run docs:skills` to refresh the Agent skills table.
+2. Run `composer run docs:skills` to refresh the contributor skills table in AGENTS.md.
 3. Run `composer run lint:php` from repo root and fix any PHPCS issues.
 
 The root loader plugin auto-loads new folders under `plugins/` when **CoverKit Use Cases** is active.
