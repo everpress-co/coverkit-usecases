@@ -11,8 +11,6 @@ coverkit-usecases/
 ├── coverkit-usecases.php           # WordPress plugin — loads all use cases
 ├── plugins/
 │   └── coverkit-usecase-starter/   # example / test use case
-├── bin/
-│   └── link-local.sh               # removes legacy per-plugin symlinks
 ├── composer.json                   # PHP dev tools (PHPCS)
 └── package.json                    # npm scripts (lint wrappers)
 ```
@@ -30,8 +28,6 @@ coverkit-usecases/
 3. Activate **CoverKit** and **CoverKit Use Cases** in **Plugins** — all use cases under `plugins/` load automatically.
 
 4. Open a CoverKit template in the editor — custom use cases appear in the **Use cases** sidebar.
-
-Run `./bin/link-local.sh` only if you previously symlinked individual use case plugins into `wp-content/plugins/`; it removes those legacy symlinks.
 
 ## Adding a new use case
 
