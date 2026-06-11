@@ -81,7 +81,9 @@ foreach ( $plugin_dirs as $plugin_dir ) {
 	$constant_prefix = slug_to_constant_prefix( $slug );
 
 	if ( is_readable( $bootstrap_file ) ) {
-		if ( plugin_uses_version_constant( $slug ) ) {
+		$bootstrap_contents = (string) file_get_contents( $bootstrap_file );
+
+		if ( plugin_uses_version_constant( $slug, $bootstrap_contents ) ) {
 			$updated = sync_bootstrap_file( $bootstrap_file, $version, $constant_prefix );
 		} else {
 			$updated = sync_bootstrap_header_only( $bootstrap_file, $version );
@@ -225,7 +227,7 @@ function validate_plugin_version_consistency( string $plugin_dir, string $slug )
 		return "Invalid Version in {$bootstrap_file}: {$header_version}";
 	}
 
-	if ( plugin_uses_version_constant( $slug ) && ! preg_match(
+	if ( plugin_uses_version_constant( $slug, $contents ) && ! preg_match(
 		"/^define\(\s*'{$constant_prefix}_VERSION',\s*'{$header_version}'\s*\);/m",
 		$contents
 	) ) {
@@ -252,15 +254,16 @@ function validate_plugin_version_consistency( string $plugin_dir, string $slug )
 }
 
 /**
- * Whether a use case bootstrap defines VERSION/FILE/DIR constants.
+ * Whether a use case bootstrap defines a VERSION constant.
  *
- * The in-repo starter template stays minimal; release plugins use constants.
- *
- * @param string $slug Plugin folder slug.
+ * @param string $slug     Plugin folder slug.
+ * @param string $contents Bootstrap file contents.
  * @return bool
  */
-function plugin_uses_version_constant( string $slug ): bool {
-	return 'coverkit-usecase-starter' !== $slug;
+function plugin_uses_version_constant( string $slug, string $contents ): bool {
+	$constant_prefix = slug_to_constant_prefix( $slug );
+
+	return (bool) preg_match( "/define\(\s*'{$constant_prefix}_VERSION'/", $contents );
 }
 
 /**
