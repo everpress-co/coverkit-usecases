@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build / cache
+build/
+.phpunit.cache
+.eslintcache
+*.zip
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Environment
+.env

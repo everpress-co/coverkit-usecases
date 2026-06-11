@@ -60,6 +60,8 @@ coverkit-usecases/
 
 4. Run `./bin/link-local.sh` again to symlink the new plugin.
 
+Or use the Cursor command **`/new-usecase <slug>`** — it scaffolds the plugin from the starter template (see `.cursor/rules/new-usecase.mdc`).
+
 See CoverKit docs: [Custom use cases](https://github.com/everpress/coverkit/blob/develop/docs/src/content/docs/user-guide/use-cases/custom-use-case.md).
 
 ## Scripts

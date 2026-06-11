@@ -1,0 +1,13 @@
+{
+	"name": "coverkit-usecases",
+	"private": true,
+	"description": "Custom CoverKit use cases — one WordPress plugin per use case.",
+	"license": "GPL-2.0-or-later",
+	"engines": {
+		"node": "^20.0.0"
+	},
+	"scripts": {
+		"lint:php": "composer run lint:php",
+		"lint:php:fix": "composer run lint:php:fix"
+	}
+}
