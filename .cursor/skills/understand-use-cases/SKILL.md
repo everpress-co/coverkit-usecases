@@ -29,7 +29,7 @@ On `coverkit_init` (priority **5**, before registry boot at 10):
 ) );
 ```
 
-- **`label` only** — inherits base `CoverKit\Use_Case` behavior (dimensions, mappings, settings from defaults).
+- **`label` only** — inherits base `CoverKit\Use_Case` behavior (dimensions, field catalog, settings from defaults). Editors bind fields on template layers via native block bindings.
 - **`class`** — subclass `CoverKit\Use_Case` for `recommended_settings()`, `use_case_mapping_sources()`, `use_case_settings_schema()`, and `init()` hooks.
 
 Defer `require_once` of subclass files until inside the `coverkit_init` callback so `Use_Case` is loaded.

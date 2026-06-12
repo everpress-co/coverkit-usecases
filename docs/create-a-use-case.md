@@ -10,7 +10,7 @@ Read this skill and create a CoverKit use case:
 https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 ```
 
-The skill asks follow-up questions (purpose, editor vs front-end output, field mappings), infers dimensions from your use case, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the directory where you invoked it (usually your WordPress `plugins/` folder). See [root `SKILL.md`](../SKILL.md).
+The skill asks follow-up questions (purpose, editor vs front-end output, field catalog), infers dimensions from your use case, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the directory where you invoked it (usually your WordPress `plugins/` folder). See [root `SKILL.md`](../SKILL.md).
 
 ---
 
@@ -46,7 +46,7 @@ Step-by-step guide to add a custom CoverKit use case in this repository.
 
 | Approach | When to use |
 | --- | --- |
-| **Label only** | Default dimensions and mappings are fine; no front-end hooks. |
+| **Label only** | Default dimensions and field catalog are fine; no front-end hooks. |
 | **Subclass `CoverKit\Use_Case`** | Custom dimensions, settings schema, mapping sources, or runtime hooks. |
 
 See [`architecture.md`](architecture.md) and CoverKit [custom use case docs](https://docs.coverkit.com/user-guide/use-cases/custom-use-case/) ([output profiles](https://docs.coverkit.com/codebase/use-cases-and-output-profiles/)).

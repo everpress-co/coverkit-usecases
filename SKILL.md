@@ -76,7 +76,7 @@ When the user’s goal is vague, offer concrete ideas grounded in the examples a
 | **Front-end integration** | Custom meta tags, alternate featured image, category/archive hero, WooCommerce product card |
 | **Vertical formats** | Podcast cover (3000×3000), YouTube thumbnail (1280×720), story/reel (1080×1920), event poster |
 
-Match complexity to need: **label-only** registration when defaults suffice; **subclass** when output settings, editor settings, mappings, or runtime hooks differ.
+Match complexity to need: **label-only** registration when defaults suffice; **subclass** when output settings, editor settings, field catalog, or runtime hooks differ.
 
 ## Hard rule
 
@@ -90,18 +90,18 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 
 | # | Question | Why |
 | --- | --- | --- |
-| 1 | **What is this use case for?** — A clear description of the goal, context, and where the image matters (e.g. "header graphic for Mailchimp newsletters — editors preview and download in the template editor" or "LinkedIn share image on single posts, injected as `og:image`"). | Drives label, slug, purpose, dimensions, mappings, and label-only vs subclass |
+| 1 | **What is this use case for?** — A clear description of the goal, context, and where the image matters (e.g. "header graphic for Mailchimp newsletters — editors preview and download in the template editor" or "LinkedIn share image on single posts, injected as `og:image`"). | Drives label, slug, purpose, dimensions, field catalog, and label-only vs subclass |
 
 **Do not ask for plugin author metadata** — infer **Author**, **Author URI**, and **Plugin URI** silently (see below). Omit header lines when unknown.
 
-**Do not ask for "output" separately** — dimensions, crop, formats, editor-only vs front-end behavior, and field mappings depend on the use case. Infer them from a good description; ask follow-ups only when the description leaves gaps.
+**Do not ask for "output" separately** — dimensions, crop, formats, editor-only vs front-end behavior, and field bindings depend on the use case. Infer them from a good description; ask follow-ups only when the description leaves gaps.
 
 ### Follow-up questions (when relevant)
 
 | Trigger | Question |
 | --- | --- |
 | Runtime behavior unclear from description | **Where should the image be used?** — Template editor preview/download only, or also on the live site (e.g. `<meta property="og:image">`, featured image, custom hook)? |
-| Mapping needs unclear | **Which WordPress fields should editors map?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
+| Field catalog unclear | **Which WordPress fields should appear in the bindings catalog?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
 | Target folder unclear | **Where should the plugin be scaffolded?** Offer options based on **Resolve scaffold target** (below). Default: **in place** when the current directory is already the plugin root; **subfolder** when the current directory is a parent like `plugins/`. |
@@ -109,7 +109,7 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 
 ### Infer from the description (do not ask for output upfront)
 
-From a good use case description, decide **dimensions, crop, formats, editor-only vs front-end behavior, and field mappings** using examples in **Explore existing examples**. State your inferences in the Phase 1 summary so the user can correct them — ask follow-ups only when the description is vague or non-standard.
+From a good use case description, decide **dimensions, crop, formats, editor-only vs front-end behavior, and field catalog** using examples in **Explore existing examples**. State your inferences in the Phase 1 summary so the user can correct them — ask follow-ups only when the description is vague or non-standard.
 
 | Use case type | Typical inference |
 | --- | --- |
