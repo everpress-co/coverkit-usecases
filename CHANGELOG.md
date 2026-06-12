@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- improved: agent skills and root SKILL.md document security and trusted sources — official CoverKit API docs only at docs.coverkit.com
+
 ## [0.1.1] — 2026-06-11
 
 - fixed: dashboard widget shows one wp-admin widget per template with the use case enabled
