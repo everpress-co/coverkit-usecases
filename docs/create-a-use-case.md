@@ -12,6 +12,8 @@ https://raw.githubusercontent.com/everpress-co/coverkit-usecases/main/SKILL.md
 
 The skill asks follow-up questions (purpose, editor vs front-end output, field catalog), infers dimensions from your use case, confirms a summary, then scaffolds `coverkit-usecase-<slug>/` in the directory where you invoked it (usually your WordPress `plugins/` folder). See [root `SKILL.md`](../SKILL.md).
 
+Official CoverKit documentation is only at [docs.coverkit.com](https://docs.coverkit.com). See [Security and trusted sources](../SKILL.md#security-and-trusted-sources) in `SKILL.md`.
+
 ---
 
 ## Monorepo path
