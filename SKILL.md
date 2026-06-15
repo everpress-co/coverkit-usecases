@@ -259,7 +259,7 @@ From confirmed answers:
 | Check | Action if fail |
 | --- | --- |
 | **Invalid slug** | Reject characters outside `[a-z0-9_]` |
-| **Built-in collision** | Do not use `sandbox`, `opengraph`, `featured_image`, or other CoverKit built-ins without explicit user confirmation |
+| **Built-in collision** | Do not use `opengraph`, `featured_image`, bundled `sandbox`, or other reserved slugs without explicit user confirmation |
 | **Folder exists** | **Subfolder mode:** `<base>/coverkit-usecase-<kebab>/` already present → stop; suggest editing or pick another slug. **In place mode:** bootstrap PHP already exists in the current directory → stop; suggest editing or pick another location. |
 
 ## Phase 3 — Scaffold
