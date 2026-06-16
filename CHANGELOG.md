@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-06-16
+
 - fixed: loader and bundled use case plugins register with global `coverkit_register_use_case()` so they work with current CoverKit releases
 - improved: root SKILL.md documents CoverKit 0.2.2+ features — document sidebar previews, per-post setting overrides, block bindings, and responsive REST image widths
 - improved: starter use case shows a description in the CoverKit template editor

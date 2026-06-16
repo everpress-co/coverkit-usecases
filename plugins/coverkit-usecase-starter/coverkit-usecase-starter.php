@@ -3,7 +3,7 @@
  * Plugin Name: CoverKit Use Case: Starter
  * Plugin URI: https://github.com/everpress-co/coverkit-usecases
  * Description: Minimal editor-only test use case for the CoverKit use cases monorepo.
- * Version: 0.1.0
+ * Version: 0.1.3
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
