@@ -165,6 +165,7 @@ if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
 
 // Load CoverKit helpers without Freemius (coverkit vendor autoload pulls in wordpress-sdk).
 require_once COVERKIT_PLUGIN_DIR . 'includes/functions.php';
+require_once COVERKIT_PLUGIN_DIR . 'includes/pluggable.php';
 
 spl_autoload_register(
 	static function ( string $class_name ): void {

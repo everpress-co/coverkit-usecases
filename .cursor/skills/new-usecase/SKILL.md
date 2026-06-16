@@ -101,7 +101,7 @@ Label only:
 
 ```php
 function coverkit_usecase_<snake>_register(): void {
-    \CoverKit\coverkit_register_use_case(
+    coverkit_register_use_case(
         '<snake>',
         array(
             'label' => __( '<Label>', '<text-domain>' ),
@@ -118,7 +118,7 @@ With custom subclass:
 function coverkit_usecase_<snake>_register(): void {
     require_once COVERKIT_USECASE_<SNAKE_UPPER>_DIR . 'includes/class-<kebab>-use-case.php';
 
-    \CoverKit\coverkit_register_use_case(
+    coverkit_register_use_case(
         '<snake>',
         array(
             'class' => \<Namespace>\<Wp_Class>::class,

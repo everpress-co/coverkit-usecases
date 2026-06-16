@@ -3,7 +3,7 @@
  * Plugin Name: CoverKit Use Case: Dashboard widget
  * Plugin URI: https://coverkit.com
  * Description: Site-wide wp-admin dashboard widget with a CoverKit generated image as the background.
- * Version: 0.1.1
+ * Version: 0.1.3
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 function coverkit_usecase_dashboard_widget_register(): void {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-dashboard-widget-use-case.php';
 
-	\CoverKit\coverkit_register_use_case(
+	coverkit_register_use_case(
 		'dashboard_widget',
 		array(
 			'class' => \CoverKitUseCaseDashboardWidget\Dashboard_Widget_Use_Case::class,

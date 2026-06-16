@@ -22,7 +22,7 @@ To scaffold a new use case, use [root `SKILL.md`](../../../SKILL.md) (paste the 
 On `coverkit_init` (priority **5**, before registry boot at 10):
 
 ```php
-\CoverKit\coverkit_register_use_case( 'my_slug', array(
+coverkit_register_use_case( 'my_slug', array(
     'label' => __( 'My use case', 'coverkit-usecase-my-slug' ),
     // Optional:
     'class' => My_Use_Case::class,
