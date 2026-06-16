@@ -331,7 +331,7 @@ defined( 'ABSPATH' ) || exit;
 add_action(
  'coverkit_init',
  static function (): void {
-  \CoverKit\coverkit_register_use_case(
+  coverkit_register_use_case(
    '<snake>',
    array(
     'label' => __( '<Label>', 'coverkit-usecase-<kebab>' ),
@@ -363,7 +363,7 @@ add_action(
  static function (): void {
   require_once plugin_dir_path( __FILE__ ) . 'includes/class-<kebab>-use-case.php';
 
-  \CoverKit\coverkit_register_use_case(
+  coverkit_register_use_case(
    '<snake>',
    array(
     'class' => \CoverKitUseCase<Studly>\<Wp_Class>::class,
@@ -480,7 +480,7 @@ $image_url = static::get_image_url(
 );
 ```
 
-Lower-level fallback when you are not inside a use case class: `\CoverKit\coverkit_rest_use_case_image_url( '<snake>', $template_id, $post_id, 'jpg', null, false )`.
+Lower-level fallback when you are not inside a use case class: `coverkit_rest_use_case_image_url( '<snake>', $template_id, $post_id, 'jpg', null, false )`.
 
 | Where the image is used | Registration | Last argument to helper |
 | --- | --- | --- |
@@ -490,7 +490,7 @@ Lower-level fallback when you are not inside a use case class: `\CoverKit\coverk
 When front-end or meta-tag use was confirmed in discovery, register as public:
 
 ```php
-\CoverKit\coverkit_register_use_case(
+coverkit_register_use_case(
  '<snake>',
  array(
   'label'  => __( '<Label>', 'coverkit-usecase-<kebab>' ),

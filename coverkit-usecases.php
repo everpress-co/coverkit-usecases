@@ -78,7 +78,7 @@ function coverkit_usecases_admin_notice_missing_coverkit(): void {
 		return;
 	}
 
-	if ( function_exists( 'CoverKit\coverkit_register_use_case' ) ) {
+	if ( function_exists( 'coverkit_register_use_case' ) ) {
 		return;
 	}
 
