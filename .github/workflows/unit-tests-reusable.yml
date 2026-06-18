@@ -12,7 +12,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -36,10 +36,10 @@ jobs:
 
         steps:
             - name: Checkout use cases
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Checkout CoverKit
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
               with:
                   repository: everpress-co/coverkit
                   ref: develop
@@ -70,7 +70,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
