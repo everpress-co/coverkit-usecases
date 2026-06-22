@@ -1,6 +1,6 @@
 {
 	"name": "coverkit-usecases",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"private": true,
 	"description": "Custom CoverKit use cases — one WordPress plugin per use case.",
 	"license": "GPL-2.0-or-later",

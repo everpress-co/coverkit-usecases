@@ -12,9 +12,17 @@ $repo_root = dirname( __DIR__ );
 $check_only      = in_array( '--check', $argv, true );
 $changed_since   = null;
 $sync_all_plugins = true;
+$loader_only      = false;
 
 for ( $index = 1; $index < $argc; $index++ ) {
 	$arg = $argv[ $index ];
+
+	if ( '--loader-only' === $arg ) {
+		$loader_only      = true;
+		$sync_all_plugins = false;
+		$changed_since    = null;
+		continue;
+	}
 
 	if ( '--changed-since' === $arg ) {
 		$changed_since = $argv[ $index + 1 ] ?? '';
@@ -71,6 +79,10 @@ sort( $plugin_dirs, SORT_STRING );
 
 foreach ( $plugin_dirs as $plugin_dir ) {
 	$slug = basename( $plugin_dir );
+
+	if ( $loader_only ) {
+		continue;
+	}
 
 	if ( ! $sync_all_plugins && null !== $changed_since && ! plugin_has_changes_since( $repo_root, $changed_since, $slug ) ) {
 		continue;

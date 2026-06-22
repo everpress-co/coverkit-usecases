@@ -107,7 +107,7 @@ CoverKit ships built-in use cases that show advanced patterns. Read about them i
 
 | Built-in | Typical purpose | Patterns to learn |
 | --- | --- | --- |
-| **Open Graph** | Social share previews | Fixed 1200×630, editor toggles (post types, front page, archives), `wp_head` meta injection, per-post **Alt text** override, **Show in document sidebar** preview |
+| **Open Graph** | Social share previews | Fixed 1200×675, editor toggles (post types, front page, archives), `wp_head` meta injection, per-post **Alt text** override, **Show in document sidebar** preview |
 | **Featured image** | Replace post thumbnails | Canvas-native sizing, front-end filter hooks, post-type scoping, responsive `srcset`/`sizes` via REST |
 | **Sandbox** | Editor experimentation | Full settings schema (text, toggle, textarea), mapping catalog, override-field examples |
 
@@ -163,7 +163,7 @@ From a good use case description, decide **dimensions, crop, formats, editor-onl
 
 | Use case type | Typical inference |
 | --- | --- |
-| Open Graph / Facebook / generic social share | 1200×630, crop, `jpg` + `webp` |
+| Open Graph / Facebook / generic social share | 1200×675, crop, `jpg` + `webp` |
 | LinkedIn share | 1200×627, crop |
 | Pinterest pin | 1000×1500, crop |
 | X / Twitter card | 1200×675 or platform default, crop |
@@ -395,7 +395,7 @@ protected static function recommended_settings(): array {
  return array(
   'dimensions' => array(
    'width'  => 1200,
-   'height' => 630,
+   'height' => 675,
   ),
   'crop'       => true,
   'formats'    => array( 'jpg', 'webp' ),
