@@ -141,7 +141,7 @@ Skip when label-only registration is enough. When needed:
 
 ### readme.txt
 
-- Match plugin name/description; `Stable tag:` = `package.json` version; changelog entry for initial release.
+- Match plugin name/description; `Stable tag:` = `package.json` version; `Requires at least: 7.0`; `Tested up to:` = `package.json` `wordpress.testedUpTo` (release sync keeps this current); changelog entry for initial release.
 
 ### Optional asset build
 

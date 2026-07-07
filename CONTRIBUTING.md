@@ -32,12 +32,12 @@ CI runs the same checks on pull requests. CoverKit is checked out from the `deve
 
 ## Version sync and releases
 
-**Source of truth:** [`package.json`](package.json) `"version"`.
+**Source of truth:** [`package.json`](package.json) `"version"` and `wordpress` compatibility (`requiresAtLeast` **7.0**, `testedUpTo` latest stable WordPress).
 
 ```bash
 composer run sync:version              # propagate version to loader + all plugins
 composer run sync:version -- --loader-only   # loader only (Phase 3 post-release)
-composer run sync:version -- --changed-since X.Y.Z   # loader + changed plugins only (release branch)
+composer run sync:version -- --changed-since X.Y.Z --update-wp-tested-up-to   # release branch
 composer run sync:version:check  # CI / pre-commit drift check
 composer run package:release     # build install-ready zips to dist/
 composer run package:release:verify
@@ -48,8 +48,11 @@ composer run package:release:verify
 | Target | Fields |
 | --- | --- |
 | `coverkit-usecases.php` | `Version:` header, `COVERKIT_USECASES_VERSION` (always) |
-| Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` |
-| Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` |
+| Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` (when plugin changed / `--all-plugins`) |
+| Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` (same rule as bootstrap version) |
+| **All** plugin bootstraps + `readme.txt` | `Requires at least: 7.0`, `Tested up to:` from `package.json` `wordpress` (every sync except `--loader-only`) |
+
+On release, `--update-wp-tested-up-to` fetches the latest stable WordPress from `api.wordpress.org` and writes `package.json` `wordpress.testedUpTo` before propagating to every plugin.
 
 On `develop`, `package.json` already tracks the **in-progress release** (bumped in **Phase 3** of `/do-usecase-release` after the previous release merges).
 

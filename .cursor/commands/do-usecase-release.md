@@ -94,21 +94,28 @@ All release edits, tests, commits, and tags happen **on this branch**, not on `d
    done
    ```
 
-3. Sync loader + changed plugins only:
+3. Sync loader + changed plugins only (and WordPress compatibility for **all** plugins):
 
    ```bash
    if [[ -z "$PREV_TAG" ]]; then
-     composer run sync:version -- --all-plugins
+     composer run sync:version -- --all-plugins --update-wp-tested-up-to
    else
-     composer run sync:version -- --changed-since "$PREV_TAG"
+     composer run sync:version -- --changed-since "$PREV_TAG" --update-wp-tested-up-to
    fi
    ```
 
 | Target | When synced |
 | --- | --- |
 | [`coverkit-usecases.php`](coverkit-usecases.php) | Always (`Version:` + `COVERKIT_USECASES_VERSION`) |
-| Each `plugins/coverkit-usecase-*/{slug}.php` | Only if `git diff <prev-tag>..HEAD -- plugins/<slug>/` is non-empty |
-| Each `plugins/coverkit-usecase-*/readme.txt` | Same rule as bootstrap (`Stable tag:`) |
+| Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` + `*_VERSION` only if `git diff <prev-tag>..HEAD -- plugins/<slug>/` is non-empty |
+| Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` — same rule as bootstrap version |
+| **All** plugin bootstraps + `readme.txt` | `Requires at least:` **7.0** and `Tested up to:` — **every release**, all plugins |
+
+**WordPress compatibility (every release):**
+
+1. Source of truth: [`package.json`](package.json) `wordpress.requiresAtLeast` (must stay **7.0**) and `wordpress.testedUpTo`.
+2. Pass **`--update-wp-tested-up-to`** with `sync:version` on the release branch. It fetches the latest stable WordPress from `api.wordpress.org`, writes `wordpress.testedUpTo` to `package.json`, then propagates both fields to every plugin bootstrap (`Requires at least:`) and `readme.txt` (`Requires at least:` + `Tested up to:`).
+3. Unchanged plugins still get compatibility header updates even when their semver is not bumped.
 
 `--changed-since` uses `git diff` on the plugin folder only (not monorepo root files). New plugins under `plugins/` count as changed. Do **not** run plain `composer run sync:version` during release — that bumps every plugin.
 
@@ -148,6 +155,7 @@ Present a compact summary:
 - Branch: `release/<version>`
 - Release version (already on `develop` — no monorepo bump on this branch)
 - Loader sync and which plugins were version-synced vs left unchanged (from `git diff`)
+- WordPress compatibility: `package.json` `wordpress.testedUpTo` and all plugins updated to `Requires at least: 7.0` + latest `Tested up to:`
 - CHANGELOG: `## [Unreleased]` renamed to `## [<release>] — YYYY-MM-DD`
 - Expected GitHub Release assets: `dist/coverkit-usecase-*-<plugin-version>.zip` (one per folder in `plugins/`; version per plugin header)
 - Test / lint / packaging results (pass/fail)
@@ -165,7 +173,7 @@ If **no** → **stop**. Leave the release branch and local changes for the user 
 On **`release/<version>`**, stage release-intended files:
 
 ```bash
-git add CHANGELOG.md coverkit-usecases.php plugins/
+git add CHANGELOG.md coverkit-usecases.php package.json plugins/
 git commit -m "release: <version>"
 git tag <version>
 ```
