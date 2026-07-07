@@ -35,7 +35,9 @@ CI runs the same checks on pull requests. CoverKit is checked out from the `deve
 **Source of truth:** [`package.json`](package.json) `"version"`.
 
 ```bash
-composer run sync:version        # propagate version to PHP headers and readme.txt files
+composer run sync:version              # propagate version to loader + all plugins
+composer run sync:version -- --loader-only   # loader only (Phase 3 post-release)
+composer run sync:version -- --changed-since X.Y.Z   # loader + changed plugins only (release branch)
 composer run sync:version:check  # CI / pre-commit drift check
 composer run package:release     # build install-ready zips to dist/
 composer run package:release:verify
@@ -49,9 +51,11 @@ composer run package:release:verify
 | Each `plugins/coverkit-usecase-*/{slug}.php` | `Version:` header, `COVERKIT_USECASE_*_VERSION` |
 | Each `plugins/coverkit-usecase-*/readme.txt` | `Stable tag:` |
 
-At release time, use `composer run sync:version -- --changed-since X.Y.Z` so only plugins with changes since the previous tag are bumped. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
+On `develop`, `package.json` already tracks the **in-progress release** (bumped in **Phase 3** of `/do-usecase-release` after the previous release merges).
 
-**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That creates a `release/x.y.z` branch, bumps `package.json`, runs sync + packaging verify, commits, and tags `X.Y.Z` (no `v` prefix).
+At release time, use `composer run sync:version -- --changed-since X.Y.Z` so only plugins with changes since the previous tag are synced to the monorepo version. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
+
+**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That creates a `release/x.y.z` branch from the version already on `develop`, syncs changed plugins, renames `## [Unreleased]` in CHANGELOG, commits, and tags `X.Y.Z` (no `v` prefix). **Phase 3** bumps `develop` to the next version and opens a fresh `## [Unreleased]`.
 
 Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **two zips per folder** in `plugins/coverkit-usecase-*`: a versioned archive (`<slug>-<version>.zip`) and a stable alias (`<slug>.zip`) for README download links via `releases/latest/download/<slug>.zip`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 
