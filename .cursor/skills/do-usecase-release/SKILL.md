@@ -13,7 +13,7 @@ Follow [`.cursor/commands/do-usecase-release.md`](../../commands/do-usecase-rele
 | --- | --- |
 | Branch | Start on `develop`; create `release/<version>` |
 | Version source | [`package.json`](../../../package.json) — **is** the release version (no bump on release branch) |
-| Release sync | `composer run sync:version -- --changed-since <prev-tag>` (loader always; plugins only when `git diff` shows changes) |
+| Release sync | `composer run sync:version -- --changed-since <prev-tag> --update-wp-tested-up-to` (loader always; plugin semver only when changed; **all** plugins get WP compatibility) |
 | Packages | `composer run package:release:verify` before tag |
 | Tag | `<version>` (e.g. `0.1.1` — no `v` prefix) |
 | Phase 3 | After merge to `develop`: `npm version` next patch, `composer run sync:version -- --loader-only`, fresh `## [Unreleased]` |
