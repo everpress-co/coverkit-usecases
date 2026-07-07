@@ -23,7 +23,7 @@ class Dashboard_Widget_Use_Case extends Use_Case {
 	 *
 	 * @return bool
 	 */
-	protected static function include_post_type_in_settings_schema(): bool {
+	protected static function include_applicability_settings(): bool {
 		return false;
 	}
 

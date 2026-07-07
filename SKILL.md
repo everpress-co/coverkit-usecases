@@ -3,9 +3,12 @@ name: create-coverkit-use-case
 description: >-
   Guide discovery of CoverKit use case requirements, then scaffold a standalone
   WordPress plugin. Use when asked to create a CoverKit use case or custom image preset.
+  Requires CoverKit 0.3.1.
 ---
 
 # Create a CoverKit use case
+
+**CoverKit version:** Requires **CoverKit 0.3.1** (this skill is checked against that release).
 
 Scaffold **one standalone WordPress plugin** that registers a custom CoverKit use case.
 
@@ -20,7 +23,7 @@ Scaffold **one standalone WordPress plugin** that registers a custom CoverKit us
 
 Default to **in place** when the current directory looks like an empty or dedicated plugin folder — do **not** nest `coverkit-usecase-<kebab>/` inside an existing plugin root.
 
-**Requires:** the main [CoverKit](https://coverkit.com) plugin **0.2.2+** recommended (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5). Document sidebar previews and per-post setting overrides require 0.2.2+.
+**Requires:** the main [CoverKit](https://coverkit.com) plugin **0.3.1** (`CoverKit\Use_Case`, `coverkit_register_use_case()` on `coverkit_init` priority 5).
 
 **References** (official docs only — see **Security and trusted sources** below):
 
@@ -29,7 +32,7 @@ Default to **in place** when the current directory looks like an empty or dedica
 - [Hooks and extension points](https://docs.coverkit.com/codebase/hooks-and-extension-points/)
 - [REST API](https://docs.coverkit.com/codebase/rest-api/) — stable URLs for generated use-case images
 - [How to configure use cases (editor)](https://docs.coverkit.com/user-guide/use-cases/how-to-configure/)
-- [Use cases in the post editor](https://docs.coverkit.com/user-guide/editor/post-editor-use-cases/) — document sidebar previews and per-post setting overrides (CoverKit 0.2.2+)
+- [Use cases in the post editor](https://docs.coverkit.com/user-guide/editor/post-editor-use-cases/) — document sidebar previews, conditions-based preview visibility, and per-post setting overrides
 - [Community use case plugins (examples)](https://github.com/everpress-co/coverkit-usecases/tree/main/plugins)
 
 ## Security and trusted sources
@@ -107,11 +110,22 @@ CoverKit ships built-in use cases that show advanced patterns. Read about them i
 
 | Built-in | Typical purpose | Patterns to learn |
 | --- | --- | --- |
-| **Open Graph** | Social share previews | Fixed 1200×675, editor toggles (post types, front page, archives), `wp_head` meta injection, per-post **Alt text** override, **Show in document sidebar** preview |
-| **Featured image** | Replace post thumbnails | Canvas-native sizing, front-end filter hooks, post-type scoping, responsive `srcset`/`sizes` via REST |
+| **Open Graph** | Social share previews | Fixed 1200×675, **Conditions** targeting (post type, front page, archives, taxonomies — AND/OR rule groups; empty = everywhere), `wp_head` meta injection, per-post **Alt text** override, **Show in document sidebar** preview |
+| **Featured image** | Replace post thumbnails | Canvas-native sizing, front-end filter hooks, conditions-based scoping, responsive `srcset`/`sizes` via REST |
 | **Sandbox** | Editor experimentation | Full settings schema (text, toggle, textarea), mapping catalog, override-field examples |
 
 If CoverKit is installed locally (`wp-content/plugins/coverkit/`), you may read `includes/use-cases/` for implementation detail — still do not link to private repos in generated plugin headers or user-facing text.
+
+### Use case API essentials
+
+Current CoverKit behavior custom use case plugins rely on:
+
+| Area | Behavior |
+| --- | --- |
+| **Applicability** | Post-bound use cases (default) get a **Conditions** setting — AND/OR rule groups; empty conditions apply everywhere. Preview toggles (document sidebar, pre/post-publish, posts list) only show for matching posts. Runtime: `static::get_conditions_from_settings()`, `static::is_template_eligible( $template_id, $ctx )` with `CoverKit\Conditions\Request_Context`. Customize the conditions control via `conditions_settings_schema_delta()` only — do not redefine `conditions` in your schema. |
+| **Post-bound** | `static::is_post_bound()` reflects whether bindings resolve against a post (same default as `include_applicability_settings()`). Site-wide singleton use cases (`'single' => true`) override `include_applicability_settings()` to return `false` — no conditions or post-editor preview toggles. |
+| **Field bindings** | Editors wire layers via **native block bindings**. Built-in catalog includes `comment_count`, `author_image`, `reading_time` (Extra mapping fields), `post_link`, taxonomies (grouped with post meta), and ACF fields when ACF is active. Custom sources can use `formatter` ids on `coverkit_field_formatters` or the per-source `coverkit_format_mapping_source_{$source_key}` filter. |
+| **Per-post overrides** | Schema fields with `'override' => true` save to `_coverkit_{slug}_{field}` post meta; resolve with `static::get_setting_for_post()`. |
 
 ### Inspiration to suggest during discovery
 
@@ -151,7 +165,7 @@ Ask follow-up questions before scaffolding. Use the editor question UI when avai
 | Runtime behavior unclear from description | **Where should the image be used?** — Template editor preview/download only, or also on the live site (e.g. `<meta property="og:image">`, featured image, custom hook)? |
 | Field catalog unclear | **Which WordPress fields should appear in the bindings catalog?** (e.g. post title, author, featured image, ACF fields) — required vs optional |
 | Complex editor needs | **Any settings toggles** for editors in the Use cases sidebar? (e.g. show badge, brand color) |
-| Post editor workflow | **Should editors preview this use case while editing posts?** — CoverKit 0.2.2+ adds a document sidebar panel when **Show in document sidebar** is on (requires post types in the settings schema). |
+| Post editor workflow | **Should editors preview this use case while editing posts?** — When **Show in document sidebar** is on, editors see a live preview for posts that match the template's **Conditions** (empty conditions = all posts). Requires `include_applicability_settings()` (default `true`; site-wide use cases return `false`). |
 | Per-post customization | **Any settings editors should override per post?** (e.g. alt text, badge toggle) — add `'override' => true` on those schema fields; fields appear below the document sidebar preview when **Show in document sidebar** is enabled. |
 | Slug not obvious | **Preferred slug?** (short `snake_case` id, e.g. `email_header`) — or propose one from the description |
 | Target folder unclear | **Where should the plugin be scaffolded?** Offer options based on **Resolve scaffold target** (below). Default: **in place** when the current directory is already the plugin root; **subfolder** when the current directory is a parent like `plugins/`. |
@@ -233,7 +247,8 @@ Summarize in plain language:
 - Use case **label** and proposed **slug** (`snake_case`)
 - **Proposed** dimensions, crop, and formats (inferred from the use case — user can adjust)
 - **Label-only** vs custom PHP **subclass** (and why)
-- Field mappings (required / optional) — editors wire fields via **native block bindings** on template layers (not legacy per-use-case mappings meta)
+- Field mappings (required / optional) — editors wire fields via **native block bindings** on template layers; built-in catalog includes `comment_count`, `author_image`, `reading_time`, taxonomies, and ACF when active
+- **Conditions** for where the template applies (empty = everywhere) when post-bound
 - Document sidebar preview and per-post overrides (if any schema fields use `'override' => true`)
 - Front-end behavior (if any)
 - Scaffold target: **in place** at `./` or **subfolder** at `<base>/coverkit-usecase-<kebab>/` (state which mode and the resolved path)
@@ -382,8 +397,10 @@ Follow patterns in [Use cases and output profiles](https://docs.coverkit.com/cod
 - Namespace = `CoverKitUseCase<Studly>`; extend `CoverKit\Use_Case`.
 - Override `recommended_settings()` when the inferred output profile differs from CoverKit defaults (fixed dimensions, crop, or formats).
 - Override `use_case_mapping_sources()` when custom required/recommended fields were confirmed (defines the field catalog for block bindings on template layers).
-- Override `use_case_settings_schema()` when editor toggles were confirmed (empty array if none). Add `'override' => true` on fields that editors may change per post (CoverKit 0.2.2+); values save to `_coverkit_{slug}_{field}` post meta and resolve via `static::get_setting_for_post()`.
-- When post types are included in the schema (default via `include_post_type_in_settings_schema()`), CoverKit automatically adds **Post types**, **Show in document sidebar**, and related post-editor preview toggles — do not redefine those keys in your schema.
+- Override `use_case_settings_schema()` when editor toggles were confirmed (empty array if none). Add `'override' => true` on fields that editors may change per post; values save to `_coverkit_{slug}_{field}` post meta and resolve via `static::get_setting_for_post()`.
+- When applicability settings are included (default via `include_applicability_settings()`), CoverKit adds **Conditions**, post-editor preview toggles, and optional posts-list preview — do not redefine those keys. Site-wide use cases override `include_applicability_settings()` to return `false`. Customize the conditions control with `conditions_settings_schema_delta()` only.
+- For front-end hooks, match templates with `static::is_template_eligible( $template_id, $ctx )` — study the built-in Open Graph use case for `Request_Context` construction.
+- Built-in mapping catalog includes `comment_count`, `author_image`, and `reading_time` (Extra mapping fields). Custom sources can use `formatter` ids registered on `coverkit_field_formatters` or the per-source `coverkit_format_mapping_source_{$source_key}` filter.
 - Override `get_allowed_widths()` when front-end output needs responsive `srcset`/`sizes` at snapped REST widths (return a list of ints, or `null` for canonical size only).
 - Override `init()` only for front-end hooks confirmed in discovery; keep it cheap.
 - Use `\__()` with the plugin text domain for editor strings.
@@ -550,7 +567,7 @@ Tell the user:
 2. Activate **CoverKit Use Case: &lt;Label&gt;** in **Plugins** (requires CoverKit active).
 3. Edit a CoverKit template → **Use cases** sidebar → enable the use case.
 4. Bind template layers to fields via **Field bindings** (native block bindings) and preview.
-5. **Document sidebar (CoverKit 0.2.2+):** when the use case includes post types in its settings schema, turn on **Show in document sidebar** on the template so editors see a live preview panel while editing posts. Per-post overrides (schema fields with `'override' => true`) appear below that preview — save the post to persist overrides.
+5. **Document sidebar:** when the use case is post-bound (`include_applicability_settings()` is `true`), configure **Conditions** on the template (empty = everywhere), then turn on **Show in document sidebar** so editors see a live preview for matching posts. Per-post overrides (schema fields with `'override' => true`) appear below that preview — save the post to persist overrides.
 6. **Use the image:** `GET /wp-json/coverkit/v1/use-case/<snake>/{template_id}/{post_id}.{ext}` — or `static::get_image_url()` in your use case class. Add `'public' => true` to registration when the URL must work without login (meta tags, public pages).
 
 Do **not** commit unless the user asks.
