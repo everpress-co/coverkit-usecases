@@ -1,27 +1,42 @@
 ---
-description: Prepare and cut a coverkit-usecases monorepo release — version sync, packaging verify, release branch and tag, then post-release version bump on develop
+description: Prepare and cut a coverkit-usecases monorepo release — bump version first (default patch), sync changed plugins, release branch and tag, then restore ## [Unreleased] on develop
 ---
 
 # Prepare and cut a CoverKit Use Cases release
 
-Run a **three-phase** release workflow. **Stop on any failure** — do not commit, tag, or push through red tests or an empty `## [Unreleased]` without calling it out and getting explicit user direction.
+Run a **three-phase** release workflow. **Bump the monorepo version first** (default **patch**), then ship that version. **Stop on any failure** — do not commit, tag, or push through red tests or an empty `## [Unreleased]` without calling it out and getting explicit user direction.
 
-**Changelog-first:** Day-to-day work updates [`CHANGELOG.md`](CHANGELOG.md) under `## [Unreleased]`. This command renames that section to the release version, tags the version already on `develop`, and **Phase 3** bumps `develop` to the next version for ongoing feature work.
+**Changelog-first:** Day-to-day work updates [`CHANGELOG.md`](CHANGELOG.md) under `## [Unreleased]`. Version files on `develop` track the **last shipped** release. This command **bumps** to the release version first, renames `## [Unreleased]` to that version, syncs changed plugins, and tags. **Phase 3** only restores an empty `## [Unreleased]` on `develop` after merge — **no** post-release version bump.
 
 ## Overview
 
 ```text
-develop (version = release, ## [Unreleased] has bullets)
-  → pre-flight: release = package.json version (no patch bump)
-  → release/<version> — sync changed plugins, CHANGELOG rename (no monorepo bump)
+develop (version = last shipped, ## [Unreleased] has bullets)
+  → pre-flight on develop
+  → bump monorepo version first (default patch, or minor/major/x.y.z)
+  → release/<version> — sync changed plugins, CHANGELOG rename
   → package:release:verify + tests
   → checkpoint → commit + tag
   → checkpoint → optional push
   → merge release/<version> → develop (user confirms)
-  → Phase 3: bump monorepo to next version + loader sync + fresh ## [Unreleased]
+  → Phase 3: fresh ## [Unreleased] on develop (no version bump)
 ```
 
 Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml) (unit tests, `package:release`, one install-ready zip per use case on the GitHub Release). Tag format: **`<version>`** — semver **without** a `v` prefix (e.g. `0.1.1`, not `v0.1.1`).
+
+### Slash-command arguments
+
+Parse the first argument after `/do-usecase-release` (optional):
+
+| Argument | Release version |
+| --- | --- |
+| *(none)* | **patch** bump of current `package.json` |
+| `patch` | same as default |
+| `minor` | minor bump |
+| `major` | major bump |
+| `x.y.z` | exact semver — set `package.json` (and loader) to that value |
+
+There is **no** separate post-ship next-version bump. The next `/do-usecase-release` bumps again from the version just shipped.
 
 ---
 
@@ -35,30 +50,52 @@ Run **before** creating the release branch. Do **not** auto-merge feature branch
 | **Sync `develop`** | `git fetch origin`. Compare `develop` to `origin/develop`; `git pull origin develop` if behind (warn if offline / fetch fails). |
 | **Working tree** | Prefer a **clean** tree on `develop`. If uncommitted changes exist → **stop** and show `git status -sb`. Continue only if the user **explicitly** accepts releasing with those changes. |
 
-Then **resolve release version** (next section). After resolution:
+Then **resolve and bump release version** (next section). After the bump:
 
 | Check | Action if fail |
 | --- | --- |
 | **Duplicate branch/tag** | After fetch: `release/<version>` must not exist locally or on `origin`. `git tag -l '<version>'` must be empty locally; check remote tags after fetch. → **stop**. |
-| **Version file drift** | [`package.json`](package.json) `"version"` must match [`coverkit-usecases.php`](coverkit-usecases.php) `Version:` and `COVERKIT_USECASES_VERSION`. → **stop** on drift. |
+| **Version file consistency** | After bump + loader sync: [`package.json`](package.json) `"version"` must match [`coverkit-usecases.php`](coverkit-usecases.php) `Version:` and `COVERKIT_USECASES_VERSION`. → **stop** on drift. |
 | **CHANGELOG ready** | `## [Unreleased]` must have **at least one** bullet (`-` lines). Empty section → **stop** before branching. |
 
 ---
 
-## Resolve release version
+## Resolve and bump release version (first version step)
 
-1. Read `release` from [`package.json`](package.json): `jq -r '.version'`.
-2. Verify it matches [`coverkit-usecases.php`](coverkit-usecases.php) `Version:` — **stop** on drift.
-3. Echo: `Releasing <release> (version already on develop).`
-4. **Do not** patch-bump or minor-bump when resolving `release`. The version on `develop` **is** the release.
+Run on **`develop`** after pre-flight branch/sync/tree checks, **before** creating `release/<version>`.
 
-Optional `patch` / `minor` / `major` from the user applies only in [Phase 3](#phase-3--post-release-bump-on-develop) when bumping to the **next** development version.
+1. Read **current** from [`package.json`](package.json): `CURRENT=$(jq -r '.version' package.json)`.
+2. Verify current matches [`coverkit-usecases.php`](coverkit-usecases.php) `Version:` / `COVERKIT_USECASES_VERSION` — **stop** on drift (fix before bumping).
+3. Parse the slash-command argument (see [Slash-command arguments](#slash-command-arguments)).
+4. Compute and apply `<release>`:
+
+   ```bash
+   # default / patch
+   RELEASE=$(npm version patch --no-git-tag-version | tr -d v)
+
+   # minor / major — same pattern with npm version minor|major
+
+   # exact x.y.z
+   RELEASE=0.4.0
+   npm version "$RELEASE" --no-git-tag-version
+   ```
+
+5. Sync the **loader only** so the bootstrap matches `package.json` immediately:
+
+   ```bash
+   composer run sync:version -- --loader-only
+   ```
+
+6. Echo: `Releasing <release> (bumped from <current>).`
+7. Re-check duplicate branch/tag for `<release>` after the bump.
+
+**Do not** defer the monorepo bump to after tag or push. Per-plugin semver sync for **changed** plugins still happens on the release branch (next section).
 
 ---
 
 ## Phase 2 — Create `release/<version>` branch
 
-Still on **`develop`**, after pre-flight and version resolution succeed:
+Still on **`develop`**, after pre-flight and version bump succeed:
 
 ```bash
 git checkout develop
@@ -66,13 +103,13 @@ git pull origin develop   # if network OK; else warn and continue with local dev
 git checkout -b release/<version>
 ```
 
-All release edits, tests, commits, and tags happen **on this branch**, not on `develop`.
+Carry uncommitted version bumps onto the release branch. All release edits, tests, commits, and tags happen **on this branch**, not on `develop`.
 
 ---
 
-## Sync changed plugin versions (no monorepo bump)
+## Sync changed plugin versions
 
-**Do not** run `npm version` on the release branch — [`package.json`](package.json) already equals `<release>`.
+[`package.json`](package.json) and the loader already equal `<release>` from the bump step.
 
 **Per-use-case plugin versions** — sync **only when that plugin changed** since the previous release so changed plugins match the monorepo version. Unchanged plugins keep their existing `Version:` / `Stable tag:`.
 
@@ -84,6 +121,7 @@ All release edits, tests, commits, and tags happen **on this branch**, not on `d
 
    - If `PREV_TAG` is empty (first release), sync all plugins.
    - Otherwise use `PREV_TAG` as the diff base (e.g. `0.1.1`).
+   - If `PREV_TAG` equals the new `<release>` (should not happen after a real bump), **stop** — tag already exists.
 
 2. List changed plugins (for the release summary):
 
@@ -144,7 +182,7 @@ Run from repo root in order:
 
 `package:release:verify` builds `dist/<slug>-<plugin-version>.zip` locally (version from each bootstrap `Version:` header) and asserts each zip contains `<slug>/<slug>.php`. Do **not** commit `dist/` or `build/release/` (gitignored; CI rebuilds on tag push).
 
-**Scope warning:** Before commit, run `git status`. If files outside CHANGELOG/plugin sync paths changed, **warn** and only stage intended release files unless the user says otherwise.
+**Scope warning:** Before commit, run `git status`. If files outside CHANGELOG/plugin sync/version paths changed, **warn** and only stage intended release files unless the user says otherwise.
 
 ---
 
@@ -153,7 +191,7 @@ Run from repo root in order:
 Present a compact summary:
 
 - Branch: `release/<version>`
-- Release version (already on `develop` — no monorepo bump on this branch)
+- Release version (bumped from `<current>` → `<release>`; argument used)
 - Loader sync and which plugins were version-synced vs left unchanged (from `git diff`)
 - WordPress compatibility: `package.json` `wordpress.testedUpTo` and all plugins updated to `Requires at least: 7.0` + latest `Tested up to:`
 - CHANGELOG: `## [Unreleased]` renamed to `## [<release>] — YYYY-MM-DD`
@@ -173,7 +211,7 @@ If **no** → **stop**. Leave the release branch and local changes for the user 
 On **`release/<version>`**, stage release-intended files:
 
 ```bash
-git add CHANGELOG.md coverkit-usecases.php package.json plugins/
+git add CHANGELOG.md coverkit-usecases.php package.json package-lock.json plugins/
 git commit -m "release: <version>"
 git tag <version>
 ```
@@ -196,7 +234,7 @@ git push origin <version>
 
 ---
 
-## Phase 3 — post-release bump on `develop`
+## Phase 3 — restore `## [Unreleased]` on `develop`
 
 Run only after:
 
@@ -210,32 +248,17 @@ git pull origin develop
 # git merge release/<version>
 ```
 
-Determine **next** version bump type:
+**Do not** run `npm version` or `composer run sync:version` for a next-cycle bump. `develop` stays on `<release>` (the version just shipped).
 
-- Default: **patch** (`npm version patch --no-git-tag-version`)
-- User said `minor` or `major` in the original `/do-usecase-release` invocation → use that for Phase 3 only
-
-```bash
-NEXT=$(npm version patch --no-git-tag-version | tr -d v)   # or minor / major
-```
-
-Sync **loader only** (not all plugins):
+Insert an empty `## [Unreleased]` at the top of [`CHANGELOG.md`](CHANGELOG.md) if it is missing after the merge.
 
 ```bash
-composer run sync:version -- --loader-only
+git add CHANGELOG.md
+git commit -m "chore: open Unreleased section for next development cycle"
 ```
 
-Do **not** pass `--all-plugins` or `--changed-since` in Phase 3 — only the monorepo loader version changes.
-
-Insert empty `## [Unreleased]` at the top of [`CHANGELOG.md`](CHANGELOG.md).
-
-```bash
-git add package.json package-lock.json CHANGELOG.md coverkit-usecases.php
-git commit -m "chore: bump to $NEXT for next development cycle"
-```
-
-- **Do not** tag `$NEXT`.
-- **Checkpoint 3:** summary of bumped files + ask before push to `origin develop`.
+- Skip the commit if `## [Unreleased]` already exists and nothing else changed.
+- **Checkpoint 3:** summary + ask before push to `origin develop`.
 
 If **yes**:
 
@@ -253,7 +276,8 @@ After Phase 3, verify:
 - [ ] GitHub Release has one zip per `plugins/coverkit-usecase-*`
 - [ ] Each zip extracts to `wp-content/plugins/<slug>/`
 - [ ] `release/<version>` merged into `develop`
-- [ ] Phase 3 bump landed on `develop` (`$NEXT` + fresh `## [Unreleased]`)
+- [ ] `develop` version files remain at `<release>` (no post-ship bump)
+- [ ] Fresh `## [Unreleased]` on `develop`
 
 **Out of scope:** monorepo loader zip, README changelog sync, Freemius.
 
@@ -263,12 +287,16 @@ After Phase 3, verify:
 
 User: **`/do-usecase-release`**
 
-Agent: pre-flight on `develop` → `release = package.json` → `release/<version>` → sync loader/changed plugins (`--changed-since`) + CHANGELOG rename (no monorepo bump) → verify → summary → user “proceed” → commit + tag → optional push → merge → Phase 3 bump to next patch on `develop`.
+Agent: pre-flight on `develop` → **bump patch** → `release/<version>` → sync loader/changed plugins (`--changed-since`) + CHANGELOG rename → verify → summary → user “proceed” → commit + tag → optional push → merge → Phase 3 opens `## [Unreleased]` only.
 
-User: **`/do-usecase-release minor`** — Phase 3 uses a **minor** bump for the next development version.
+User: **`/do-usecase-release minor`** — bump minor first, then ship that version.
+
+User: **`/do-usecase-release 0.2.0`** — set monorepo version to `0.2.0`, then ship.
 
 ---
 
-## One-time transition (2026-06-22)
+## Transition note
 
-Repos that shipped without a post-release bump (e.g. `0.1.3`) need a single Phase 3 on `develop` before the new workflow applies: bump to the next patch (loader via `--loader-only`) and ensure `## [Unreleased]` exists at the top of CHANGELOG. This was applied when the post-release workflow was adopted.
+Under the previous workflow, **Phase 3** bumped `develop` to the *next* version after each release. Now version files on `develop` stay at the **last shipped** release until the next `/do-usecase-release` bumps again.
+
+If `package.json` is already ahead of the latest git tag and you want to **ship that version without another bump**, pass it explicitly (exact current). Default `/do-usecase-release` always patch-bumps.

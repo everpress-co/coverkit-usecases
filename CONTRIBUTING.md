@@ -36,7 +36,7 @@ CI runs the same checks on pull requests. CoverKit is checked out from the `deve
 
 ```bash
 composer run sync:version              # propagate version to loader + all plugins
-composer run sync:version -- --loader-only   # loader only (Phase 3 post-release)
+composer run sync:version -- --loader-only   # loader only (after monorepo bump, before per-plugin sync)
 composer run sync:version -- --changed-since X.Y.Z --update-wp-tested-up-to   # release branch
 composer run sync:version:check  # CI / pre-commit drift check
 composer run package:release     # build install-ready zips to dist/
@@ -54,11 +54,11 @@ composer run package:release:verify
 
 On release, `--update-wp-tested-up-to` fetches the latest stable WordPress from `api.wordpress.org` and writes `package.json` `wordpress.testedUpTo` before propagating to every plugin.
 
-On `develop`, `package.json` already tracks the **in-progress release** (bumped in **Phase 3** of `/do-usecase-release` after the previous release merges).
+On `develop`, `package.json` tracks the **last shipped** release. **`/do-usecase-release`** bumps first (default **patch**, or `minor` / `major` / exact `x.y.z`), then tags that version.
 
 At release time, use `composer run sync:version -- --changed-since X.Y.Z` so only plugins with changes since the previous tag are synced to the monorepo version. Unchanged plugins keep their own version; release zips are named from each plugin’s `Version:` header.
 
-**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That creates a `release/x.y.z` branch from the version already on `develop`, syncs changed plugins, renames `## [Unreleased]` in CHANGELOG, commits, and tags `X.Y.Z` (no `v` prefix). **Phase 3** bumps `develop` to the next version and opens a fresh `## [Unreleased]`.
+**Cut a release:** use **`/do-usecase-release`** in Cursor (see [`.cursor/commands/do-usecase-release.md`](.cursor/commands/do-usecase-release.md)). That bumps the monorepo version first, creates `release/x.y.z`, syncs changed plugins, renames `## [Unreleased]` in CHANGELOG, commits, and tags `X.Y.Z` (no `v` prefix). **Phase 3** opens a fresh `## [Unreleased]` on `develop` — **no** post-ship version bump.
 
 Pushing the tag triggers GitHub Actions, which runs `package:release` and attaches **two zips per folder** in `plugins/coverkit-usecase-*`: a versioned archive (`<slug>-<version>.zip`) and a stable alias (`<slug>.zip`) for README download links via `releases/latest/download/<slug>.zip`. Each zip extracts to `wp-content/plugins/<slug>/` (WordPress-installable folder root).
 
