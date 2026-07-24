@@ -1,0 +1,16 @@
+<!--
+  Sandbox QA fixture — native block bindings on coverkit/layer
+
+  Manual test (WordPress 7.0+):
+  1. Create a new coverkit template and paste this markup in the Code editor.
+  2. Activate CoverKit Use Cases and enable the Sandbox use case; select a preview post.
+  3. Verify bound-title shows the post title and bound-image shows the featured image.
+-->
+
+<!-- wp:coverkit/meta {"title":"Block bindings QA","width":300,"height":300,"background":"#1a1a2e"} /-->
+
+<!-- wp:coverkit/layer {"id":"bound-title","text":"Static placeholder","color":"#ffffff","height":"72px","width":"280px","x":"10px","y":"16px","typography":{"textAlign":"center","verticalAlign":"center","fontSize":22,"fontFamily":"system-ui","fontWeight":600},"metadata":{"name":"Bound title","bindings":{"text":{"source":"coverkit/field","args":{"field":"post_title"}}}}} /-->
+
+<!-- wp:coverkit/layer {"id":"bound-image","height":"160px","width":"160px","x":"70px","y":"96px","metadata":{"name":"Bound featured image","bindings":{"image":{"source":"coverkit/field","args":{"field":"featured_image"}},"imageId":{"source":"coverkit/field","args":{"field":"featured_image"}}}}} /-->
+
+<!-- wp:coverkit/layer {"id":"static-label","text":"Sandbox bindings QA","color":"#6b7280","height":"28px","width":"280px","x":"10px","y":"268px","typography":{"textAlign":"center","fontSize":11},"metadata":{"name":"Static label"}} /-->

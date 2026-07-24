@@ -44,6 +44,11 @@ function coverkit_usecases_load_plugins(): void {
 		return;
 	}
 
+	$sandbox_bootstrap = $plugins_dir . '/coverkit-sandbox/coverkit-sandbox.php';
+	if ( is_readable( $sandbox_bootstrap ) ) {
+		require_once $sandbox_bootstrap;
+	}
+
 	$plugin_dirs = glob( $plugins_dir . '/coverkit-usecase-*', GLOB_ONLYDIR );
 
 	if ( false === $plugin_dirs ) {

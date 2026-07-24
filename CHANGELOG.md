@@ -11,6 +11,8 @@
 - improved: root SKILL.md documents CoverKit 0.2.2+ features — document sidebar previews, per-post setting overrides, block bindings, and responsive REST image widths
 - improved: starter use case shows a description in the CoverKit template editor
 
+- added: Sandbox use case bundled at `plugins/coverkit-sandbox/` (moved from CoverKit core)
+
 ## [0.1.2] — 2026-06-12
 
 - improved: agent skills and root SKILL.md document security and trusted sources — official CoverKit API docs only at docs.coverkit.com

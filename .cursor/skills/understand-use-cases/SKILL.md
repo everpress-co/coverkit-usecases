@@ -36,7 +36,7 @@ Defer `require_once` of subclass files until inside the `coverkit_init` callback
 
 ## Built-in slugs (avoid collisions)
 
-CoverKit ships built-ins such as `sandbox`, `opengraph`, `featured_image`. Custom slugs should be distinct (e.g. `email_header`, `pinterest_board`).
+CoverKit core built-ins are `opengraph` and `featured_image`. Custom slugs should be distinct (e.g. `email_header`, `pinterest_board`). The bundled Sandbox module in this repo uses slug `sandbox`.
 
 ## CoverKit reference (trusted sources)
 

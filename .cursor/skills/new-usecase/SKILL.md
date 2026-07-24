@@ -168,6 +168,6 @@ Do **not** commit unless the user asks.
 ## Do not
 
 - Put multiple use cases in one plugin.
-- Register on a slug that collides with CoverKit built-ins (`sandbox`, `opengraph`, `featured_image`, etc.) without user confirmation.
+- Register on a slug that collides with CoverKit built-ins (`opengraph`, `featured_image`, bundled `sandbox`, etc.) without user confirmation.
 - Mutate `coverkit-usecase-starter` when scaffolding — copy it.
 - Omit the WordPress plugin header — every bootstrap must be installable as a top-level plugin.

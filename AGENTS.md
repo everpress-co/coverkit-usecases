@@ -21,7 +21,7 @@ See [root `SKILL.md`](SKILL.md) and [`docs/create-a-use-case.md`](docs/create-a-
 - One use case per plugin folder; do not combine multiple registrations in one bootstrap.
 - Every bootstrap needs a **full WordPress plugin header** (installable from release zips).
 - Register on `coverkit_init` priority **5**; defer subclass `require_once` until that callback.
-- Avoid slug collisions with CoverKit built-ins (`opengraph`, `featured_image`, `sandbox`, …).
+- Avoid slug collisions with CoverKit built-ins (`opengraph`, `featured_image`, …) and bundled Sandbox (`sandbox`).
 
 ## Contributor skills (`.cursor/skills/`)
 

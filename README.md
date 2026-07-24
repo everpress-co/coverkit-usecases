@@ -19,7 +19,7 @@ Each zip is a standalone WordPress plugin with `Requires Plugins: coverkit`.
 If you work from the full repository (e.g. to try everything or contribute):
 
 1. Clone into `wp-content/plugins/coverkit-usecases/`.
-2. Activate **CoverKit** and **CoverKit Use Cases** in **Plugins** — every use case under `plugins/` loads automatically.
+2. Activate **CoverKit** and **CoverKit Use Cases** in **Plugins** — Sandbox (`plugins/coverkit-sandbox/`) and every use case under `plugins/coverkit-usecase-*` load automatically.
 3. Open a CoverKit template → **Use cases** sidebar to enable a use case.
 
 ## Use in the editor
@@ -28,6 +28,14 @@ If you work from the full repository (e.g. to try everything or contribute):
 2. Edit a CoverKit template.
 3. In the **Use cases** sidebar, turn on the use case you installed.
 4. Map template shapes to WordPress fields and preview the generated image.
+
+## Bundled with CoverKit Use Cases
+
+| Module | Use case slug | Purpose |
+| --- | --- | --- |
+| [coverkit-sandbox](plugins/coverkit-sandbox/) | `sandbox` | Editor-only reference implementation — every built-in setting control, live preview, no front-end output |
+
+See [docs/sandbox.md](docs/sandbox.md).
 
 ## Available use cases
 
