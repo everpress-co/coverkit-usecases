@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.5] — 2026-07-24
+
+- changed: structural change
+
 ## [0.1.4] — 2026-07-07
 
 - improved: root SKILL.md requires CoverKit 0.3.1 and documents conditions-based targeting, expanded field bindings, and the current use case API
