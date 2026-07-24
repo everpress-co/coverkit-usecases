@@ -3,7 +3,7 @@
  * Plugin Name: CoverKit Use Case: Dashboard widget
  * Plugin URI: https://coverkit.com
  * Description: Site-wide wp-admin dashboard widget with a CoverKit generated image as the background.
- * Version: 0.1.4
+ * Version: 0.1.5
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
