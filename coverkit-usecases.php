@@ -3,7 +3,7 @@
  * Plugin Name: CoverKit Use Cases
  * Plugin URI: https://coverkit.com
  * Description: Loads custom CoverKit use case plugins from the plugins/ directory in this package.
- * Version: 0.1.4
+ * Version: 0.1.5
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Requires Plugins: coverkit
@@ -21,7 +21,7 @@ declare(strict_types=1);
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'COVERKIT_USECASES_VERSION' ) ) {
-	define( 'COVERKIT_USECASES_VERSION', '0.1.4' );
+	define( 'COVERKIT_USECASES_VERSION', '0.1.5' );
 }
 
 if ( ! defined( 'COVERKIT_USECASES_FILE' ) ) {
